@@ -1,0 +1,98 @@
+<Page
+    x:Class="RestaurantJapanese.Views.PosPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:RestaurantJapanese.ViewModels"
+    xmlns:converters="using:RestaurantJapanese.Converters"
+    Background="{ThemeResource LayerFillColorDefaultBrush}">
+
+    <Page.Resources>
+        <converters:CurrencyConverter x:Key="CurrencyConverter"/>
+    </Page.Resources>
+
+    <!-- VM directo en XAML (sin DI). El code-behind setea propiedades y carga menú -->
+    <Page.DataContext>
+        <vm:PosVM/>
+    </Page.DataContext>
+
+    <Grid Padding="16" RowDefinitions="Auto,*">
+        <!-- Encabezado -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <TextBlock Text="{Binding UserDisplay}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="Propina:" VerticalAlignment="Center"/>
+                <TextBox Width="80" Text="{Binding Tip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Cuerpo -->
+        <Grid Grid.Row="1" ColumnDefinitions="2*,*" ColumnSpacing="16">
+            <!-- Menú -->
+            <ScrollViewer Grid.Column="0">
+                <ItemsControl ItemsSource="{Binding Menu}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                  Padding="12"
+                                  CornerRadius="8"
+                                  Margin="0,0,0,10">
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Description}" Opacity="0.7"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                               Text="{Binding Price, Converter={StaticResource CurrencyConverter}}"/>
+                                    <Button Grid.Column="2" Content="Agregar" Click="Add_Click"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Carrito -->
+            <StackPanel Grid.Column="1" Spacing="8">
+                <TextBlock Text="Carrito" FontWeight="SemiBold" FontSize="16"/>
+
+                <ListView ItemsSource="{Binding Cart}" SelectionMode="None"
+                          MaxHeight="420">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="8"
+                                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                  Padding="8" CornerRadius="8" Margin="0,0,0,6">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Grid.Column="1" Text="{Binding UnitPrice, Converter={StaticResource CurrencyConverter}}" />
+                                <!-- Qty editable -->
+                                <TextBox Grid.Column="2" Width="48"
+                                         Text="{Binding Qty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- LineTotal visible si usaste CartItem con LineTotal -->
+                                <TextBlock Grid.Column="3" Text="{Binding LineTotal, Converter={StaticResource CurrencyConverter}}" />
+                                <Button Grid.Column="4" Content="-" Width="32" Click="Remove_Click"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Totales -->
+                <StackPanel Spacing="2" Margin="0,8,0,0">
+                    <TextBlock>
+                        <Run Text="Subtotal: "/>
+                        <Run Text="{Binding Subtotal, Converter={StaticResource CurrencyConverter}}"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="IVA: "/>
+                        <Run Text="{Binding Tax, Converter={StaticResource CurrencyConverter}}"/>
+                    </TextBlock>
+                    <TextBlock FontWeight="SemiBold">
+                        <Run Text="Total: "/>
+                        <Run Text="{Binding Total, Converter={StaticResource CurrencyConverter}}"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <Button Content="Cobrar" Click="Checkout_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RestaurantJapanese (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "RestaurantJapanese (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
