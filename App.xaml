@@ -5,14 +5,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Controles WinUI -->
-                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Estilos opcionales para look limpio -->
-            <SolidColorBrush x:Key="CardBrush" Color="{ThemeResource SolidBackgroundFillColorBase}" />
-            <CornerRadius x:Key="CardCorner">12</CornerRadius>
-            <Thickness x:Key="CardPadding">12</Thickness>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
