@@ -19,10 +19,10 @@ namespace RestaurantJapanese.Data
             {
                 CommandType = System.Data.CommandType.StoredProcedure
             };
-            cmd.Parameters.AddWithValue("@UsrerName", user);
+            cmd.Parameters.AddWithValue("@UserName", user);
             cmd.Parameters.AddWithValue("@Password", password);
 
-            using var read = cmd.ExecuteReader();
+          using var read = cmd.ExecuteReader();
             if (read.Read())
             {
                 return (Convert.ToInt32(read["IdUser"]), Convert.ToString(read["DisplayName"])!);
