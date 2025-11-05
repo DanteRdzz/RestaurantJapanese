@@ -1,50 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using RestaurantJapanese.DataAcces;
+using RestaurantJapanese.Helpers;
+using RestaurantJapanese.Repository;
+using RestaurantJapanese.Repository.Interfaces;
+using RestaurantJapanese.Services;
+using RestaurantJapanese.Services.Interfaces;
+using RestaurantJapanese.ViewModels;
+using RestaurantJapanese.Views;
 
 namespace RestaurantJapanese
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public partial class App : Application
     {
-        public static Window? MainWindow { get; private set; }
+        public static IHost HostApp { get; private set; } = default!;
 
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
         public App()
         {
             InitializeComponent();
+
+            HostApp = new HostBuilder()
+                .ConfigureServices(services =>
+                {
+                    // DataAccess (usa tu fábrica de conexiones)
+                    services.AddSingleton<IConnFactory, ConnectionFactory>();
+
+                    // Repository / Services (usa tus propios nombres)
+                    services.AddTransient<ILoginRepository, LoginRepository>();
+                    services.AddTransient<ILoginService, LoginService>();
+
+                    // ViewModels
+                    services.AddTransient<LoginVM>();
+                    services.AddTransient<HomeVM>();
+
+                    // Views (opcional pedirlas via DI)
+                    services.AddTransient<LoginView>();
+                    services.AddTransient<HomeView>();
+                })
+                .Build();
+
+            // Exponer el contenedor al NavigationHelper (estilo ALTYS)
+            NavigationHelper.Services = HostApp.Services;
         }
 
-        /// <summary>
-        /// Invoked when the application is launched.
-        /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            MainWindow = new MainWindow();
-            MainWindow.Activate();
+            // Abrir la ventana de Login
+            var win = NavigationHelper.OpenWindow<LoginView, LoginVM>();
+
+            // Guardar la referencia de la Window en el VM para poder cerrarla al navegar
+            if ((win.Content as Microsoft.UI.Xaml.FrameworkElement)?.DataContext is LoginVM vm)
+                vm.OwnWindow = win;
+
+            win.Activate();
         }
     }
 }
