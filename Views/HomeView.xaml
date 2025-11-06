@@ -2,7 +2,203 @@
     x:Class="RestaurantJapanese.Views.HomeView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Padding="16">
-        <TextBlock Text="{Binding Title}" FontSize="24" FontWeight="SemiBold"/>
+    
+    <Grid Background="{StaticResource JpGradientBg}" Padding="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Encabezado Japonés Tradicional -->
+        <StackPanel Grid.Row="0" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center" 
+                    Spacing="24">
+            
+            <!-- Logo/Banner tradicional -->
+            <Border Background="{StaticResource JpSurfaceBrush}" 
+                    CornerRadius="{StaticResource JpRadiusXL}"
+                    Padding="40,24"
+                    BorderBrush="{StaticResource JpGoldBrush}"
+                    BorderThickness="2">
+                <StackPanel Spacing="16">
+                    <!-- Título principal con decoración -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                        <TextBlock Text="??" FontSize="40" VerticalAlignment="Center"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="????????" 
+                                       FontSize="24" 
+                                       FontWeight="Light"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource JpCrimsonBrush}"/>
+                            <TextBlock Text="RESTAURANT JAPONÉS" 
+                                       FontSize="36" 
+                                       FontWeight="Light"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource JpTextBrush}"/>
+                        </StackPanel>
+                        <TextBlock Text="??" FontSize="40" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- Línea decorativa dorada -->
+                    <Rectangle Style="{StaticResource JpSeparator}" Width="400"/>
+                    
+                    <!-- Subtítulo -->
+                    <TextBlock Text="Auténtica experiencia culinaria japonesa" 
+                               FontSize="18" 
+                               FontStyle="Italic"
+                               HorizontalAlignment="Center"
+                               Foreground="{StaticResource JpMutedBrush}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Contenido Central -->
+        <StackPanel Grid.Row="1" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center" 
+                    Spacing="32" 
+                    MaxWidth="800">
+
+            <!-- Mensaje de bienvenida -->
+            <Border Style="{StaticResource JpAdminCard}" MaxWidth="600">
+                <StackPanel Spacing="20" HorizontalAlignment="Center">
+                    <!-- Icono central -->
+                    <Border Background="{StaticResource JpCrimsonBrush}" 
+                            CornerRadius="35" 
+                            Width="70" Height="70"
+                            HorizontalAlignment="Center">
+                        <TextBlock Text="??" 
+                                   FontSize="32" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    
+                    <TextBlock Text="{Binding Title}" 
+                               Style="{StaticResource JpCardTitle}"
+                               HorizontalAlignment="Center"
+                               FontSize="28"/>
+                    
+                    <TextBlock Text="Bienvenido a nuestro sistema de gestión restaurante. Disfruta de la elegancia y simplicidad de la tradición japonesa mientras administras tu negocio."
+                               Style="{StaticResource JpCardDescription}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               LineHeight="24"
+                               MaxWidth="500"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Tarjetas de características -->
+            <Grid ColumnSpacing="24" MaxWidth="700">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Gestión de Personal -->
+                <Border Grid.Column="0" Style="{StaticResource JpCard}" MinHeight="160">
+                    <StackPanel Spacing="12" HorizontalAlignment="Center">
+                        <Border Background="{StaticResource JpBambooBrush}" 
+                                CornerRadius="20" 
+                                Width="40" Height="40"
+                                HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE716;" 
+                                       Style="{StaticResource JpIcon}" 
+                                       Foreground="White" 
+                                       FontSize="16"/>
+                        </Border>
+                        <TextBlock Text="Gestión de Personal" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="16"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Administra empleados con eficiencia y elegancia" 
+                                   Style="{StaticResource JpCardDescription}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Sistema POS -->
+                <Border Grid.Column="1" Style="{StaticResource JpCard}" MinHeight="160">
+                    <StackPanel Spacing="12" HorizontalAlignment="Center">
+                        <Border Background="{StaticResource JpAccentBrush}" 
+                                CornerRadius="20" 
+                                Width="40" Height="40"
+                                HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE7BF;" 
+                                       Style="{StaticResource JpIcon}" 
+                                       Foreground="White" 
+                                       FontSize="16"/>
+                        </Border>
+                        <TextBlock Text="Sistema POS" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="16"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Ventas rápidas y precisas como un samurai" 
+                                   Style="{StaticResource JpCardDescription}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Reportes -->
+                <Border Grid.Column="2" Style="{StaticResource JpCard}" MinHeight="160">
+                    <StackPanel Spacing="12" HorizontalAlignment="Center">
+                        <Border Background="{StaticResource JpGoldBrush}" 
+                                CornerRadius="20" 
+                                Width="40" Height="40"
+                                HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE9D2;" 
+                                       Style="{StaticResource JpIcon}" 
+                                       Foreground="White" 
+                                       FontSize="16"/>
+                        </Border>
+                        <TextBlock Text="Análisis y Reportes" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="16"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Sabiduría empresarial basada en datos" 
+                                   Style="{StaticResource JpCardDescription}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+
+        <!-- Pie de página -->
+        <StackPanel Grid.Row="2" 
+                    VerticalAlignment="Bottom" 
+                    HorizontalAlignment="Center" 
+                    Spacing="12">
+            
+            <!-- Decoración inferior -->
+            <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
+                <TextBlock Text="??" FontSize="20"/>
+                <TextBlock Text="??" FontSize="20"/>
+                <TextBlock Text="??" FontSize="20"/>
+                <TextBlock Text="??" FontSize="20"/>
+                <TextBlock Text="??" FontSize="20"/>
+            </StackPanel>
+            
+            <Border Background="{StaticResource JpSurfaceBrush}" 
+                    CornerRadius="{StaticResource JpRadiusL}"
+                    Padding="20,12"
+                    BorderBrush="{StaticResource JpLineBrush}"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="Versión 1.0" 
+                               Foreground="{StaticResource JpMutedBrush}" 
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="•" Foreground="{StaticResource JpMutedBrush}"/>
+                    <TextBlock Text="Desarrollado con ?? y disciplina japonesa" 
+                               Foreground="{StaticResource JpMutedBrush}" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
     </Grid>
 </UserControl>

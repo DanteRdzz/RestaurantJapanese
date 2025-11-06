@@ -1,13 +1,10 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using RestaurantJapanese.Helpers;          // BaseViewModel, RelayCommand, NavigationHelper
+using RestaurantJapanese.Services.Interfaces; // ILoginService
+using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Microsoft.Data.SqlClient;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using RestaurantJapanese.Helpers;
-using RestaurantJapanese.Services.Interfaces;
-using RestaurantJapanese.ViewModels;
-using RestaurantJapanese.Views;
 
 namespace RestaurantJapanese.ViewModels
 {
@@ -16,103 +13,108 @@ namespace RestaurantJapanese.ViewModels
         private readonly ILoginService _auth;
         public LoginVM(ILoginService auth) => _auth = auth;
 
-        // La Window que te asignamos en App.OnLaunched para poder mostrar diálogos o cerrar
-        public Window? OwnWindow { get; set; }
+        public Window? OwnWindow { get; set; }   // La ventana actual para ReplaceWindow
 
         private string _user = "";
-        public string UserName { get => _user; set => Set(ref _user, value); }
+        public string UserName
+        {
+            get => _user;
+            set => Set(ref _user, value);
+        }
 
-        // Nota: Password puede llegar por CommandParameter; aun así la guardamos para validación
         private string _pass = "";
-        public string Password { get => _pass; set => Set(ref _pass, value); }
+        public string Password
+        {
+            get => _pass;
+            set => Set(ref _pass, value);
+        }
 
         private string? _error;
-        public string? Error { get => _error; set => Set(ref _error, value); }
-
-        public ICommand SignInCommand => new RelayCommand(async param =>
+        public string? Error
         {
-            // 1) Si viene la contraseña desde XAML, úsala
-            if (param is string pwdFromXaml && !string.IsNullOrEmpty(pwdFromXaml))
-                Password = pwdFromXaml;
+            get => _error;
+            set => Set(ref _error, value);
+        }
 
-            await SignInAsync();
+        public ICommand SignInCommand => new RelayCommand(p =>
+        {
+            // Si viene la contraseña desde PasswordBox.Password como CommandParameter
+            if (p is string pwd && !string.IsNullOrEmpty(pwd))
+                Password = pwd;
+
+            _ = SignInAsync(); // lanzar sin bloquear
         });
 
         private async Task SignInAsync()
         {
             Error = null;
 
-            // 2) Validación local
-            if (string.IsNullOrWhiteSpace(UserName?.Trim()) || string.IsNullOrWhiteSpace(Password?.Trim()))
-            {
-                Error = "Usuario y Contraseña Requeridos";
-                return;
-            }
+            var u = UserName?.Trim();
+            var pw = Password?.Trim();
+
+            if (string.IsNullOrWhiteSpace(u) || string.IsNullOrWhiteSpace(pw))
+            { Error = "Usuario y Contraseña requeridos."; return; }
 
             try
             {
-                // 3) Autenticación
-                var user = await _auth.LoginAsync(UserName, Password);
+                var user = await _auth.LoginAsync(u!, pw!);
                 if (user is null)
-                {
-                    Error = "Credenciales inválidas.";
-                    return;
-                }
+                { Error = "Credenciales inválidas."; return; }
 
-                // 4) Mensaje por rol
                 var role = (user.Role ?? "").Trim().ToLowerInvariant();
+
                 if (role == "admin")
                 {
-                    NavigationHelper.OpenWindow<AdminMenuView, AdminMenuVM>();
+                    // Navegar al panel de administración
+                    NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.AdminMenuView,
+                                                  RestaurantJapanese.ViewModels.AdminMenuVM>(OwnWindow!);
+
+                    if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.AdminMenuVM vmAdmin)
+                        vmAdmin.OwnWindow = OwnWindow;
                 }
-                 
+                else if (role == "empleado" || role == "cajero")
+                {
+                    // Navegar a POS; el VM cargará el menú automáticamente al asignar CurrentUserId
+                    NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.PosView,
+                                                  RestaurantJapanese.ViewModels.PosVM>(OwnWindow!);
 
-                // 5) (Opcional) Navegar
-                // if (OwnWindow is not null)
-                //     NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.HomeView, RestaurantJapanese.ViewModels.HomeVM>(OwnWindow);
-            }
-            catch (SqlException ex)
-            {
-                // Errores típicos de conexión
-                if (ex.Number == 40 || ex.Number == 26)
-                    Error = "No se pudo conectar a SQL Server. Revisa servidor/instancia y TCP/IP.";
-                else if (ex.Number == -1)
-                    Error = "Servidor no accesible. Verifica el nombre del servidor o firewall.";
-                else if (ex.Number == -2) // timeout
-                    Error = "Tiempo de espera agotado (timeout).";
+                    if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.PosVM vmPos)
+                    {
+                        vmPos.OwnWindow = OwnWindow;
+                        vmPos.CurrentUserId = user.IdUser; // dispara LoadMenuAsync dentro del setter
+                    }
+                }
                 else
-                    Error = $"Error SQL ({ex.Number}).";
-            }
-            catch (TimeoutException)
-            {
-                Error = "La operación tardó demasiado (timeout).";
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[Login Error] {ex}");
-                Error = "Ocurrió un error inesperado.";
-            }
-            finally
-            {
-                // (Opcional) limpiar password en memoria
-                // Password = string.Empty;
-                // OnPropertyChanged(nameof(Password));
-            }
-        }
+                {
+                    // Fallback → POS
+                    NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.PosView,
+                                                  RestaurantJapanese.ViewModels.PosVM>(OwnWindow!);
 
-        private async Task ShowDialogAsync(string title, string content)
-        {
-            var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
-            if (root is null) { Error = content; return; } // fallback si no hay Window
-
-            var dlg = new ContentDialog
+                    if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.PosVM vmPos)
+                    {
+                        vmPos.OwnWindow = OwnWindow;
+                        vmPos.CurrentUserId = user.IdUser;
+                    }
+                }
+            }
+            catch (System.Exception ex)
             {
-                Title = title,
-                Content = content,
-                CloseButtonText = "OK",
-                XamlRoot = root
-            };
-            await dlg.ShowAsync();
+                Error = ex.Message;
+
+                // (Opcional) Mensaje UI sencillo
+                var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
+                if (root is not null)
+                {
+                    var dlg = new ContentDialog
+                    {
+                        Title = "Error de inicio de sesión",
+                        Content = Error,
+                        CloseButtonText = "OK",
+                        XamlRoot = root
+                    };
+                    await dlg.ShowAsync();
+                }
+            }
         }
     }
 }
