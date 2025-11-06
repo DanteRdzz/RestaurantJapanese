@@ -29,14 +29,19 @@ namespace RestaurantJapanese
                     // Repository / Services (usa tus propios nombres)
                     services.AddTransient<ILoginRepository, LoginRepository>();
                     services.AddTransient<ILoginService, LoginService>();
+                    services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+                    services.AddTransient<IEmployeeService, EmployeeService>();
 
                     // ViewModels
                     services.AddTransient<LoginVM>();
                     services.AddTransient<HomeVM>();
+                    services.AddTransient<AdminMenuVM>();
+                    services.AddTransient<AdminEmployeesMenuVM>();
 
                     // Views (opcional pedirlas via DI)
                     services.AddTransient<LoginView>();
                     services.AddTransient<HomeView>();
+                    services.AddTransient<AdminMenuView>();
                 })
                 .Build();
 
