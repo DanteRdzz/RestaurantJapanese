@@ -11,31 +11,54 @@ namespace RestaurantJapanese.ViewModels
     {
         public Window? OwnWindow { get; set; }
 
-        // Abre el submenú de Empleados (reemplaza la ventana actual si la tienes)
+        // Propaga el Id del usuario (así el POS puede cobrar)
+        private int _currentUserId;
+        public int CurrentUserId
+        {
+            get => _currentUserId;
+            set => Set(ref _currentUserId, value);
+        }
+
+        // Empleados
         public ICommand OpenEmployeesCommand => new RelayCommand(_ =>
         {
             if (OwnWindow is not null)
                 NavigationHelper.ReplaceWindow<
-                    Views.AdminEmployeesMenuView,
-                    AdminEmployeesMenuVM>(OwnWindow);
+                    RestaurantJapanese.Views.AdminEmployeesMenuView,
+                    RestaurantJapanese.ViewModels.AdminEmployeesMenuVM>(OwnWindow);
             else
                 NavigationHelper.OpenWindow<
-                    Views.AdminEmployeesMenuView,
-                    AdminEmployeesMenuVM>();
+                    RestaurantJapanese.Views.AdminEmployeesMenuView,
+                    RestaurantJapanese.ViewModels.AdminEmployeesMenuVM>();
         });
 
-        // Por ahora, los demás módulos muestran “pendiente”
+        // Abre el POS desde el panel de administración
+        public ICommand OpenPosCommand => new RelayCommand(_ =>
+        {
+            NavigationHelper.OpenWindow<Views.PosView, PosVM>(
+                parameter: null,
+                init: (vm, _) =>
+                {
+                    vm.OwnWindow = null; // Será asignada después
+                    vm.CurrentUserId = 1; // ID temporal para demo, idealmente sería el usuario actual
+                });
+        });
+
+        // Productos (pendiente)
         public ICommand OpenProductsCommand => new RelayCommand(async _ => await PendingAsync("Gestión de Productos"));
+
+        // Reporte de ventas (pendiente)
         public ICommand OpenSalesReportCommand => new RelayCommand(async _ => await PendingAsync("Reporte de Ventas"));
-        public ICommand OpenInventoryCommand => new RelayCommand(async _ => await PendingAsync("Inventario & Proveedores"));
 
         private async Task PendingAsync(string module)
         {
             var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
+            if (root is null) return;
+
             var dlg = new ContentDialog
             {
                 Title = module,
-                Content = "En esta demo solo está implementado el módulo de Empleados. Próximamente agregaremos este módulo.",
+                Content = "Módulo pendiente. En esta demo solo está implementado Empleados y POS.",
                 CloseButtonText = "OK",
                 XamlRoot = root
             };

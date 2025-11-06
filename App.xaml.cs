@@ -23,25 +23,29 @@ namespace RestaurantJapanese
             HostApp = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    // DataAccess (usa tu fábrica de conexiones)
+                    // DataAccess 
                     services.AddSingleton<IConnFactory, ConnectionFactory>();
 
-                    // Repository / Services (usa tus propios nombres)
+                    // Repository / Services 
                     services.AddTransient<ILoginRepository, LoginRepository>();
                     services.AddTransient<ILoginService, LoginService>();
                     services.AddTransient<IEmployeeRepository, EmployeeRepository>();
                     services.AddTransient<IEmployeeService, EmployeeService>();
+                    services.AddTransient<IPosRepository, PosRepository>();
+                    services.AddTransient<IPosService, PosService>();
 
                     // ViewModels
                     services.AddTransient<LoginVM>();
                     services.AddTransient<HomeVM>();
                     services.AddTransient<AdminMenuVM>();
                     services.AddTransient<AdminEmployeesMenuVM>();
+                    services.AddTransient<PosVM>();
 
-                    // Views (opcional pedirlas via DI)
+                    // Views 
                     services.AddTransient<LoginView>();
                     services.AddTransient<HomeView>();
                     services.AddTransient<AdminMenuView>();
+                    services.AddTransient<PosView>();
                 })
                 .Build();
 
