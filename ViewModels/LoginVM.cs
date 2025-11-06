@@ -6,6 +6,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RestaurantJapanese.Helpers;
 using RestaurantJapanese.Services.Interfaces;
+using RestaurantJapanese.ViewModels;
+using RestaurantJapanese.Views;
 
 namespace RestaurantJapanese.ViewModels
 {
@@ -59,11 +61,11 @@ namespace RestaurantJapanese.ViewModels
 
                 // 4) Mensaje por rol
                 var role = (user.Role ?? "").Trim().ToLowerInvariant();
-                var content = role == "admin"
-                    ? "Rol: ADMIN — A futuro se cargará la vista de administración."
-                    : "Rol: EMPLEADO — A futuro se cargará la vista de empleado.";
-
-                await ShowDialogAsync("Login correcto", content);
+                if (role == "admin")
+                {
+                    NavigationHelper.OpenWindow<AdminMenuView, AdminMenuVM>();
+                }
+                 
 
                 // 5) (Opcional) Navegar
                 // if (OwnWindow is not null)

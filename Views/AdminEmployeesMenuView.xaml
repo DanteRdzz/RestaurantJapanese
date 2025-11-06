@@ -1,0 +1,232 @@
+<UserControl
+    x:Class="RestaurantJapanese.Views.AdminEmployeesMenuView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="{StaticResource JpBgBrush}" Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,8">
+            <TextBlock Text="Gestión de Empleados" Style="{StaticResource JpTitle}" />
+            <TextBlock Text="Lista, búsqueda, actualización y bajas del personal."
+                 Style="{StaticResource JpSubtitle}"/>
+        </StackPanel>
+
+        <!-- Tabs -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+            <RadioButton Content="Lista de empleados" IsChecked="{Binding IsListSelected, Mode=TwoWay}"/>
+            <RadioButton Content="Búsqueda" IsChecked="{Binding IsSearchSelected, Mode=TwoWay}"/>
+            <RadioButton Content="Actualizar info" IsChecked="{Binding IsUpdateSelected, Mode=TwoWay}"/>
+            <RadioButton Content="Dar de baja" IsChecked="{Binding IsDeleteSelected, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <!-- Contenido -->
+        <Grid Grid.Row="2" ColumnSpacing="12" RowSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ========== LISTA ========== -->
+            <Border Grid.ColumnSpan="2" Style="{StaticResource JpCard}" Visibility="{Binding ListVisibility}">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ToggleSwitch Header="Solo activos" IsOn="{Binding OnlyActive, Mode=TwoWay}"/>
+                        <Button Content="Refrescar" Width="120"
+                    Style="{StaticResource JpPrimaryButton}"
+                    Command="{Binding LoadAllCommand}"/>
+                    </StackPanel>
+
+                    <ListView ItemsSource="{Binding Employees}"
+                    SelectedItem="{Binding Selected, Mode=TwoWay}"
+                    SelectionMode="Single"
+                    Height="420">
+
+                        <!-- ENCABEZADOS -->
+                        <ListView.Header>
+                            <Grid Padding="8" Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90"/>
+                                    <!-- ID -->
+                                    <ColumnDefinition Width="3*"/>
+                                    <!-- Nombre -->
+                                    <ColumnDefinition Width="1.6*"/>
+                                    <!-- Rol -->
+                                    <ColumnDefinition Width="2.2*"/>
+                                    <!-- Email -->
+                                    <ColumnDefinition Width="1.8*"/>
+                                    <!-- Teléfono -->
+                                    <ColumnDefinition Width="110"/>
+                                    <!-- Activo -->
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="ID" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1" Text="Nombre" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="2" Text="Rol" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="3" Text="Email" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="4" Text="Teléfono" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="5" Text="Activo" FontWeight="SemiBold"/>
+                            </Grid>
+                        </ListView.Header>
+
+                        <!-- FILAS -->
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="1.6*"/>
+                                        <ColumnDefinition Width="2.2*"/>
+                                        <ColumnDefinition Width="1.8*"/>
+                                        <ColumnDefinition Width="110"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding IdEmployee}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding FullName}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Role}" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Email}" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding Phone}" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="5" Text="{Binding IsActive}" Foreground="{StaticResource JpMutedBrush}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ========== BÚSQUEDA ========== -->
+            <Border Grid.ColumnSpan="2" Style="{StaticResource JpCard}" Visibility="{Binding SearchVisibility}">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Width="260" PlaceholderText="Buscar por nombre, email o usuario"
+                     Style="{StaticResource JpTextBox}"
+                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Width="120" Content="Buscar"
+                    Style="{StaticResource JpPrimaryButton}"
+                    Command="{Binding SearchCommand}"/>
+                    </StackPanel>
+
+                    <ListView ItemsSource="{Binding Employees}"
+                    SelectedItem="{Binding Selected, Mode=TwoWay}"
+                    SelectionMode="Single"
+                    Height="420">
+
+                        <!-- ENCABEZADOS -->
+                        <ListView.Header>
+                            <Grid Padding="8" Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="1.6*"/>
+                                    <ColumnDefinition Width="2.2*"/>
+                                    <ColumnDefinition Width="1.8*"/>
+                                    <ColumnDefinition Width="110"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="ID" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1" Text="Nombre" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="2" Text="Rol" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="3" Text="Email" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="4" Text="Teléfono" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="5" Text="Activo" FontWeight="SemiBold"/>
+                            </Grid>
+                        </ListView.Header>
+
+                        <!-- FILAS -->
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="1.6*"/>
+                                        <ColumnDefinition Width="2.2*"/>
+                                        <ColumnDefinition Width="1.8*"/>
+                                        <ColumnDefinition Width="110"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding IdEmployee}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding FullName}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Role}" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Email}" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding Phone}" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="5" Text="{Binding IsActive}" Foreground="{StaticResource JpMutedBrush}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ========== ACTUALIZACIÓN ========== -->
+            <Border Grid.Column="0" Style="{StaticResource JpCard}" Visibility="{Binding UpdateVisibility}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Selecciona de la lista o busca por Id:" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Width="120" PlaceholderText="Id empleado"
+                     Style="{StaticResource JpTextBox}"
+                     Text="{Binding IdLookup, Mode=TwoWay}"/>
+                        <Button Width="120" Content="Cargar"
+                    Style="{StaticResource JpPrimaryButton}"
+                    Command="{Binding LoadByIdCommand}"/>
+                    </StackPanel>
+
+                    <!-- ID solo lectura -->
+                    <TextBox PlaceholderText="Id empleado" IsReadOnly="True"
+                   Style="{StaticResource JpTextBox}"
+                   Text="{Binding Editing.IdEmployee}"/>
+
+                    <TextBox PlaceholderText="Nombre completo" Style="{StaticResource JpTextBox}"
+                   Text="{Binding Editing.FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <ComboBox SelectedItem="{Binding Editing.Role, Mode=TwoWay}" PlaceholderText="Rol">
+                        <x:String>Admin</x:String>
+                        <x:String>Empleado</x:String>
+                    </ComboBox>
+
+                    <TextBox PlaceholderText="Email" Style="{StaticResource JpTextBox}"
+                   Text="{Binding Editing.Email, Mode=TwoWay}"/>
+
+                    <TextBox PlaceholderText="Teléfono" Style="{StaticResource JpTextBox}"
+                   Text="{Binding Editing.Phone, Mode=TwoWay}"/>
+
+                    <CheckBox Content="Activo" IsChecked="{Binding Editing.IsActive, Mode=TwoWay}"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Width="120" Content="Nuevo"   Style="{StaticResource JpPrimaryButton}" Command="{Binding NewCommand}"/>
+                        <Button Width="120" Content="Guardar" Style="{StaticResource JpPrimaryButton}" Command="{Binding SaveCommand}"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ========== DAR DE BAJA ========== -->
+            <Border Grid.Column="1" Style="{StaticResource JpCard}" Visibility="{Binding DeleteVisibility}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Dar de baja (soft delete)" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock Text="Selecciona de la lista o captura el Id." />
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Width="120" PlaceholderText="Id empleado"
+                     Style="{StaticResource JpTextBox}"
+                     Text="{Binding IdLookup, Mode=TwoWay}"/>
+                        <Button Width="160" Content="Baja (inactivar)"
+                    Style="{StaticResource JpPrimaryButton}"
+                    Command="{Binding SoftDeleteCommand}"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
