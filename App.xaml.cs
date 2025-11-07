@@ -33,6 +33,8 @@ namespace RestaurantJapanese
                     services.AddTransient<IEmployeeService, EmployeeService>();
                     services.AddTransient<IPosRepository, PosRepository>();
                     services.AddTransient<IPosService, PosService>();
+                    services.AddTransient<IReportsRepository, ReportsRepository>();
+                    services.AddTransient<IReportsService, ReportsService>();
 
                     // ViewModels
                     services.AddTransient<LoginVM>();
@@ -40,6 +42,7 @@ namespace RestaurantJapanese
                     services.AddTransient<AdminMenuVM>();
                     services.AddTransient<AdminEmployeesMenuVM>();
                     services.AddTransient<PosVM>();
+                    services.AddTransient<ReportsVM>();
 
                     // Views 
                     services.AddTransient<LoginView>();
@@ -47,6 +50,7 @@ namespace RestaurantJapanese
                     services.AddTransient<AdminMenuView>();
                     services.AddTransient<AdminEmployeesMenuView>();
                     services.AddTransient<PosView>();
+                    services.AddTransient<ReportsView>();
                 })
                 .Build();
 

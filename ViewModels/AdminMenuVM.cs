@@ -11,7 +11,7 @@ namespace RestaurantJapanese.ViewModels
     {
         public Window? OwnWindow { get; set; }
 
-        // Propaga el Id del usuario (así el POS puede cobrar)
+        // Propaga el Id del usuario (para POS)
         private int _currentUserId;
         public int CurrentUserId
         {
@@ -19,36 +19,54 @@ namespace RestaurantJapanese.ViewModels
             set => Set(ref _currentUserId, value);
         }
 
-        // Empleados
+        // ===== Empleados =====
         public ICommand OpenEmployeesCommand => new RelayCommand(_ =>
         {
             if (OwnWindow is not null)
-                NavigationHelper.ReplaceWindow<
-                    RestaurantJapanese.Views.AdminEmployeesMenuView,
-                    RestaurantJapanese.ViewModels.AdminEmployeesMenuVM>(OwnWindow);
+            {
+                NavigationHelper.ReplaceWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
+                    OwnWindow, parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
+            }
             else
-                NavigationHelper.OpenWindow<
-                    RestaurantJapanese.Views.AdminEmployeesMenuView,
-                    RestaurantJapanese.ViewModels.AdminEmployeesMenuVM>();
+            {
+                var win = NavigationHelper.OpenWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
+                    parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
+                win.Activate();
+            }
         });
 
-        // Abre el POS desde el panel de administración
+        // ===== POS =====
         public ICommand OpenPosCommand => new RelayCommand(_ =>
         {
-            NavigationHelper.OpenWindow<Views.PosView, PosVM>(
+            var win = NavigationHelper.OpenWindow<Views.PosView, PosVM>(
                 parameter: null,
-                init: (vm, _) =>
+                init: (vm, w) =>
                 {
-                    vm.OwnWindow = null; // Será asignada después
-                    vm.CurrentUserId = 1; // ID temporal para demo, idealmente sería el usuario actual
+                    vm.OwnWindow = w;
+                    vm.CurrentUserId = CurrentUserId > 0 ? CurrentUserId : 1;
+                    _ = vm.LoadMenuAsync();
                 });
+            win.Activate();
         });
 
-        // Productos (pendiente)
-        public ICommand OpenProductsCommand => new RelayCommand(async _ => await PendingAsync("Gestión de Productos"));
+        // ===== Reportes =====
+        public ICommand OpenSalesReportCommand => new RelayCommand(_ =>
+        {
+            if (OwnWindow is not null)
+            {
+                NavigationHelper.ReplaceWindow<Views.ReportsView, ReportsVM>(
+                    OwnWindow, parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
+            }
+            else
+            {
+                var win = NavigationHelper.OpenWindow<Views.ReportsView, ReportsVM>(
+                    parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
+                win.Activate();
+            }
+        });
 
-        // Reporte de ventas (pendiente)
-        public ICommand OpenSalesReportCommand => new RelayCommand(async _ => await PendingAsync("Reporte de Ventas"));
+        // ===== Placeholders (productos, etc.) =====
+        public ICommand OpenProductsCommand => new RelayCommand(async _ => await PendingAsync("Gestión de Productos"));
 
         private async Task PendingAsync(string module)
         {
@@ -58,7 +76,7 @@ namespace RestaurantJapanese.ViewModels
             var dlg = new ContentDialog
             {
                 Title = module,
-                Content = "Módulo pendiente. En esta demo solo está implementado Empleados y POS.",
+                Content = "Módulo pendiente. En esta demo solo está implementado Empleados, POS y Reportes.",
                 CloseButtonText = "OK",
                 XamlRoot = root
             };
