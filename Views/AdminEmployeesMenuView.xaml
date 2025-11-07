@@ -63,6 +63,20 @@
                         <TextBlock Text="Búsqueda" VerticalAlignment="Center"/>
                     </StackPanel>
                 </RadioButton>
+
+                <!-- Crear (nuevo) -->
+                <RadioButton IsChecked="{Binding IsCreateSelected, Mode=TwoWay}"
+                             Style="{x:Null}"
+                             Background="{StaticResource JpGoldBrush}"
+                             Foreground="White"
+                             CornerRadius="{StaticResource JpRadiusM}"
+                             Padding="20,12"
+                             FontWeight="SemiBold">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Crear Empleado" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
                 
                 <!-- Actualizar -->
                 <RadioButton IsChecked="{Binding IsUpdateSelected, Mode=TwoWay}"
@@ -366,6 +380,148 @@
                     <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
                 </StackPanel>
             </Border>
+
+            <!-- ========== CREAR EMPLEADO + USUARIO (FULL WIDTH, 2 COLS) ========== -->
+            <!-- ========== CREAR EMPLEADO + USUARIO (FULL WIDTH, 2 COLS) ========== -->
+            <Border Grid.ColumnSpan="2"
+        Style="{StaticResource JpAdminCard}"
+        Visibility="{Binding CreateVisibility}">
+                <StackPanel Spacing="20">
+
+                    <!-- Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Background="{StaticResource JpGoldBrush}"
+                    CornerRadius="20"
+                    Width="40" Height="40">
+                            <TextBlock Text="&#xE710;"
+                           Style="{StaticResource JpIcon}"
+                           Foreground="White"
+                           FontSize="16"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Crear Empleado y Usuario" Style="{StaticResource JpCardTitle}"/>
+                            <TextBlock Text="Alta rápida: empleado ligado a usuario"
+                           Style="{StaticResource JpCardDescription}"
+                           Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Formulario 2 columnas -->
+                    <Border Background="{StaticResource JpSurfaceBrush}"
+                CornerRadius="{StaticResource JpRadiusM}"
+                Padding="16"
+                BorderBrush="{StaticResource JpLineBrush}"
+                BorderThickness="1">
+                        <Grid ColumnSpacing="16" RowSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <!-- 0 -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- 1 -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- 2 -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- 3 -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- 4 -->
+                            </Grid.RowDefinitions>
+
+                            <!-- Row 0 -->
+                            <TextBox Grid.Row="0" Grid.Column="0"
+                         PlaceholderText="📝 Nombre completo"
+                         Style="{StaticResource JpTextBox}"
+                         Text="{Binding CreateRequest.FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <ComboBox Grid.Row="0" Grid.Column="1"
+                          SelectedItem="{Binding CreateRequest.Role, Mode=TwoWay}"
+                          PlaceholderText="👤 Rol"
+                          Background="{StaticResource JpSurfaceBrush}"
+                          BorderBrush="{StaticResource JpLineBrush}"
+                          BorderThickness="2"
+                          CornerRadius="{StaticResource JpRadiusM}"
+                          Padding="16,12" FontSize="16">
+                                <x:String>Admin</x:String>
+                                <x:String>Empleado</x:String>
+                            </ComboBox>
+
+                            <!-- Row 1 -->
+                            <TextBox Grid.Row="1" Grid.Column="0"
+                         PlaceholderText="📧 Email"
+                         Style="{StaticResource JpTextBox}"
+                         Text="{Binding CreateRequest.Email, Mode=TwoWay}"/>
+
+                            <TextBox Grid.Row="1" Grid.Column="1"
+                         PlaceholderText="📱 Teléfono"
+                         Style="{StaticResource JpTextBox}"
+                         Text="{Binding CreateRequest.Phone, Mode=TwoWay}"/>
+
+                            <!-- Row 2 -->
+                            <TextBox Grid.Row="2" Grid.Column="0"
+                         PlaceholderText="Usuario (login)"
+                         Style="{StaticResource JpTextBox}"
+                         Text="{Binding CreateRequest.UserName, Mode=TwoWay}"/>
+
+                            <PasswordBox Grid.Row="2" Grid.Column="1"
+                             x:Name="CreatePasswordBox"
+                             PasswordChar="●"
+                             PlaceholderText="Contraseña"
+                             Style="{StaticResource JpTextBox}"
+                             PasswordChanged="CreatePasswordBox_PasswordChanged"/>
+
+                            <!-- Row 3 -->
+                            <TextBox Grid.Row="3" Grid.ColumnSpan="2"
+                         PlaceholderText="Nombre para mostrar (opcional)"
+                         Style="{StaticResource JpTextBox}"
+                         Text="{Binding CreateRequest.DisplayName, Mode=TwoWay}"/>
+
+                            <!-- Row 4 -->
+                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2"
+                          Content="✅ Usuario / Empleado activo"
+                          IsChecked="{Binding CreateRequest.IsActive, Mode=TwoWay}"
+                          FontSize="16"
+                          FontWeight="SemiBold"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Botones de acción (alineados a la derecha) -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Espaciador a la izquierda -->
+                        <Border Grid.Column="0" Background="Transparent"/>
+
+                        <Button Grid.Column="1"
+                    Content="🧾 Limpiar"
+                    Style="{StaticResource JpSecondaryButton}"
+                    Command="{Binding ClearCreateCommand}"
+                    Padding="14,8"
+                    MinWidth="110"
+                    Margin="0,0,8,0"
+                    HorizontalAlignment="Right"/>
+
+                        <Button Grid.Column="2"
+                    Content="✅ Crear"
+                    Style="{StaticResource JpPrimaryButton}"
+                    Command="{Binding CreateCommand}"
+                    Padding="14,8"
+                    MinWidth="120"
+                    HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+
+
 
             <!-- ========== ACTUALIZACIÓN ========== -->
             <Border Grid.Column="0" Style="{StaticResource JpAdminCard}" Visibility="{Binding UpdateVisibility}">
