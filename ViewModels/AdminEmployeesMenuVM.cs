@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RestaurantJapanese.Helpers;              // BaseViewModel, RelayCommand
 using RestaurantJapanese.Models;               // EmployeeModel
-using RestaurantJapanese.Services;
 using RestaurantJapanese.Services.Interfaces;  // IEmployeesService
 using System;
 using System.Collections.ObjectModel;
@@ -18,6 +17,9 @@ namespace RestaurantJapanese.ViewModels
         public AdminEmployeesMenuVM(IEmployeeService svc) => _svc = svc;
 
         public Window? OwnWindow { get; set; }
+
+        // Event to notify view when create finished (success flag, message)
+        public event Action<bool, string?>? CreateCompleted;
 
         // ====== pestañas ======
         private bool _isListSelected = true;
@@ -39,6 +41,17 @@ namespace RestaurantJapanese.ViewModels
             {
                 Set(ref _isSearchSelected, value);
                 if (value) SelectSection("search");
+            }
+        }
+
+        private bool _isCreateSelected;
+        public bool IsCreateSelected
+        {
+            get => _isCreateSelected;
+            set
+            {
+                Set(ref _isCreateSelected, value);
+                if (value) SelectSection("create");
             }
         }
 
@@ -68,6 +81,7 @@ namespace RestaurantJapanese.ViewModels
         {
             ListVisibility = key == "list" ? Visibility.Visible : Visibility.Collapsed;
             SearchVisibility = key == "search" ? Visibility.Visible : Visibility.Collapsed;
+            CreateVisibility = key == "create" ? Visibility.Visible : Visibility.Collapsed;
             UpdateVisibility = key == "update" ? Visibility.Visible : Visibility.Collapsed;
             DeleteVisibility = key == "delete" ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -77,6 +91,9 @@ namespace RestaurantJapanese.ViewModels
 
         private Visibility _searchV = Visibility.Collapsed;
         public Visibility SearchVisibility { get => _searchV; set => Set(ref _searchV, value); }
+
+        private Visibility _createV = Visibility.Collapsed;
+        public Visibility CreateVisibility { get => _createV; set => Set(ref _createV, value); }
 
         private Visibility _updateV = Visibility.Collapsed;
         public Visibility UpdateVisibility { get => _updateV; set => Set(ref _updateV, value); }
@@ -129,6 +146,14 @@ namespace RestaurantJapanese.ViewModels
         private string? _error;
         public string? Error { get => _error; set => Set(ref _error, value); }
 
+        // Create request model
+        private EmployeeCreateRequest _createReq = new();
+        public EmployeeCreateRequest CreateRequest { get => _createReq; set => Set(ref _createReq, value); }
+
+        // Password for Create (PasswordBox cannot bind to Password property directly)
+        private string? _createPassword;
+        public string? CreatePassword { get => _createPassword; set => Set(ref _createPassword, value); }
+
         // ====== commands ======
         public ICommand LoadAllCommand => new RelayCommand(async _ => await LoadAsync());
         public ICommand SearchCommand => new RelayCommand(async _ => await SearchAsync());
@@ -136,6 +161,10 @@ namespace RestaurantJapanese.ViewModels
         public ICommand NewCommand => new RelayCommand(_ => Editing = new EmployeeModel());
         public ICommand SaveCommand => new RelayCommand(async _ => await SaveAsync());
         public ICommand SoftDeleteCommand => new RelayCommand(async _ => await SoftDeleteAsync());
+
+        // Create commands
+        public ICommand CreateCommand => new RelayCommand(async _ => await CreateAsync());
+        public ICommand ClearCreateCommand => new RelayCommand(_ => { CreateRequest = new EmployeeCreateRequest(); CreatePassword = null; });
 
         // ====== operaciones ======
         public async Task LoadAsync()
@@ -228,6 +257,38 @@ namespace RestaurantJapanese.ViewModels
             }
             catch (SqlException ex) { Error = $"Error SQL ({ex.Number})."; }
             catch (Exception ex) { Error = ex.Message; }
+        }
+
+        private async Task CreateAsync()
+        {
+            Error = null;
+            if (string.IsNullOrWhiteSpace(CreateRequest.FullName)) { Error = "Nombre requerido."; CreateCompleted?.Invoke(false, Error); return; }
+            if (string.IsNullOrWhiteSpace(CreateRequest.UserName)) { Error = "Usuario requerido."; CreateCompleted?.Invoke(false, Error); return; }
+            if (string.IsNullOrWhiteSpace(CreatePassword)) { Error = "Contraseña requerida."; CreateCompleted?.Invoke(false, Error); return; }
+
+            try
+            {
+                // Map password
+                CreateRequest.PasswordText = CreatePassword;
+
+                var created = await _svc.CreateWithUserAsync(CreateRequest);
+                if (created is null)
+                {
+                    Error = "No se pudo crear el empleado.";
+                    CreateCompleted?.Invoke(false, Error);
+                    return;
+                }
+
+                await LoadAsync();
+
+                // Limpiar formulario en VM (View también limpiará PasswordBox en handler)
+                CreateRequest = new EmployeeCreateRequest();
+                CreatePassword = null;
+
+                CreateCompleted?.Invoke(true, "Empleado y usuario creados correctamente.");
+            }
+            catch (SqlException ex) { Error = $"Error SQL ({ex.Number})."; CreateCompleted?.Invoke(false, Error); }
+            catch (Exception ex) { Error = ex.Message; CreateCompleted?.Invoke(false, Error); }
         }
 
         private async Task DialogAsync(string title, string msg)

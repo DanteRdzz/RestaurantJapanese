@@ -45,6 +45,7 @@ namespace RestaurantJapanese
                     services.AddTransient<LoginView>();
                     services.AddTransient<HomeView>();
                     services.AddTransient<AdminMenuView>();
+                    services.AddTransient<AdminEmployeesMenuView>();
                     services.AddTransient<PosView>();
                 })
                 .Build();
