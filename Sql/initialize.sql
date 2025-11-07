@@ -292,7 +292,7 @@ END
 GO
 
 /* Reportes */
-CREATE OR ALTER PROCEDURE dbo.sp_Sales_Report
+CREATE PROCEDURE [dbo].[sp_RestJP_Sales_Report]
   @From     DATE        = NULL,      -- inicio (incluyente). Si es NULL: últimos 30 días
   @To       DATE        = NULL,      -- fin (incluyente). Si es NULL: hoy
   @GroupBy  NVARCHAR(10) = N'DAY'    -- 'DAY' | 'WEEK' | 'MONTH'
@@ -368,8 +368,6 @@ BEGIN
     ORDER BY b.BucketStart;
 END
 GO
-
-
 
 /*5. Datos iniciales (seed idempotente) */
 PRINT 'Seed de MenuItems...';
