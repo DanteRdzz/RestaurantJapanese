@@ -1,0 +1,529 @@
+<UserControl
+    x:Class="RestaurantJapanese.Views.AdminEmployeesMenuView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="{StaticResource JpGradientBg}" Padding="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Encabezado Elegante -->
+        <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,24">
+            <!-- Título con decoración japonesa -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                <TextBlock Text="👥" FontSize="28" VerticalAlignment="Center"/>
+                <TextBlock Text="Gestión de Empleados" Style="{StaticResource JpTitle}"/>
+                <TextBlock Text="👥" FontSize="28" VerticalAlignment="Center"/>
+            </StackPanel>
+            
+            <!-- Línea decorativa -->
+            <Rectangle Style="{StaticResource JpSeparator}" Width="400"/>
+            
+            <TextBlock Text="Administración integral del personal del restaurante"
+                       Style="{StaticResource JpSubtitle}" 
+                       Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <!-- Navegación por pestañas mejorada -->
+        <Border Grid.Row="1" 
+                Background="{StaticResource JpSurfaceBrush}" 
+                CornerRadius="{StaticResource JpRadiusL}"
+                Padding="8" 
+                Margin="0,0,0,24"
+                BorderBrush="{StaticResource JpLineBrush}"
+                BorderThickness="1">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                <!-- Lista -->
+                <RadioButton IsChecked="{Binding IsListSelected, Mode=TwoWay}"
+                             Style="{x:Null}"
+                             Background="{StaticResource JpCrimsonBrush}"
+                             Foreground="White"
+                             CornerRadius="{StaticResource JpRadiusM}"
+                             Padding="20,12"
+                             FontWeight="SemiBold">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Lista de Empleados" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                
+                <!-- Búsqueda -->
+                <RadioButton IsChecked="{Binding IsSearchSelected, Mode=TwoWay}"
+                             Style="{x:Null}"
+                             Background="{StaticResource JpBambooBrush}"
+                             Foreground="White"
+                             CornerRadius="{StaticResource JpRadiusM}"
+                             Padding="20,12"
+                             FontWeight="SemiBold">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Búsqueda" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                
+                <!-- Actualizar -->
+                <RadioButton IsChecked="{Binding IsUpdateSelected, Mode=TwoWay}"
+                             Style="{x:Null}"
+                             Background="{StaticResource JpAccentBrush}"
+                             Foreground="White"
+                             CornerRadius="{StaticResource JpRadiusM}"
+                             Padding="20,12"
+                             FontWeight="SemiBold">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Actualizar Info" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                
+                <!-- Dar de baja -->
+                <RadioButton IsChecked="{Binding IsDeleteSelected, Mode=TwoWay}"
+                             Style="{x:Null}"
+                             Background="{StaticResource JpMutedBrush}"
+                             Foreground="White"
+                             CornerRadius="{StaticResource JpRadiusM}"
+                             Padding="20,12"
+                             FontWeight="SemiBold">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Dar de Baja" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+        </Border>
+
+        <!-- Contenido Principal -->
+        <Grid Grid.Row="2" ColumnSpacing="20" RowSpacing="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ========== LISTA DE EMPLEADOS ========== -->
+            <Border Grid.ColumnSpan="2" Style="{StaticResource JpAdminCard}" Visibility="{Binding ListVisibility}">
+                <StackPanel Spacing="20">
+                    <!-- Header con controles -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <Border Background="{StaticResource JpCrimsonBrush}" 
+                                    CornerRadius="20" 
+                                    Width="40" Height="40">
+                                <TextBlock Text="&#xE8FD;" 
+                                           Style="{StaticResource JpIcon}" 
+                                           Foreground="White" 
+                                           FontSize="16"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Lista de Empleados" Style="{StaticResource JpCardTitle}"/>
+                                <ToggleSwitch Header="Solo empleados activos" 
+                                              IsOn="{Binding OnlyActive, Mode=TwoWay}" 
+                                              Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                                Content="🔄 Refrescar"
+                                Style="{StaticResource JpPrimaryButton}"
+                                Command="{Binding LoadAllCommand}"
+                                Width="140"
+                                VerticalAlignment="Bottom"/>
+                    </Grid>
+
+                    <!-- Tabla de empleados -->
+                    <Border Background="{StaticResource JpSurfaceBrush}" 
+                            CornerRadius="{StaticResource JpRadiusM}" 
+                            BorderBrush="{StaticResource JpLineBrush}"
+                            BorderThickness="1">
+                        <ListView ItemsSource="{Binding Employees}"
+                                  SelectedItem="{Binding Selected, Mode=TwoWay}"
+                                  SelectionMode="Single"
+                                  Height="380"
+                                  Style="{StaticResource JpListView}">
+
+                            <!-- ENCABEZADOS -->
+                            <ListView.Header>
+                                <Border Background="{StaticResource JpGoldBrush}" 
+                                        CornerRadius="8,8,0,0" 
+                                        Padding="12,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="1.5*"/>
+                                            <ColumnDefinition Width="2.5*"/>
+                                            <ColumnDefinition Width="1.8*"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="ID" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="1" Text="Nombre Completo" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="2" Text="Rol" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="3" Text="Email" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="4" Text="Teléfono" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="5" Text="Estado" FontWeight="SemiBold" Foreground="White"/>
+                                    </Grid>
+                                </Border>
+                            </ListView.Header>
+
+                            <!-- FILAS -->
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12,8" 
+                                            Background="Transparent"
+                                            CornerRadius="{StaticResource JpRadiusS}"
+                                            Margin="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="3*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.8*"/>
+                                                <ColumnDefinition Width="100"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Background="{StaticResource JpCrimsonBrush}" 
+                                                    CornerRadius="12" 
+                                                    Width="24" Height="24" 
+                                                    HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding IdEmployee}" 
+                                                           Foreground="White" 
+                                                           FontSize="12" 
+                                                           FontWeight="SemiBold" 
+                                                           HorizontalAlignment="Center" 
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" FontWeight="SemiBold"/>
+                                            <Border Grid.Column="2" 
+                                                    Background="{StaticResource JpBambooBrush}" 
+                                                    CornerRadius="10" 
+                                                    Padding="8,4" 
+                                                    HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding Role}" 
+                                                           Foreground="White" 
+                                                           FontSize="12" 
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="3" Text="{Binding Email}" Foreground="{StaticResource JpMutedBrush}"/>
+                                            <TextBlock Grid.Column="4" Text="{Binding Phone}" Foreground="{StaticResource JpMutedBrush}"/>
+                                            <Border Grid.Column="5" 
+                                                    Background="{StaticResource JpAccentBrush}" 
+                                                    CornerRadius="10" 
+                                                    Padding="6,4" 
+                                                    HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding IsActive}" 
+                                                           Foreground="White" 
+                                                           FontSize="11" 
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Border>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ========== BÚSQUEDA ========== -->
+            <Border Grid.ColumnSpan="2" Style="{StaticResource JpAdminCard}" Visibility="{Binding SearchVisibility}">
+                <StackPanel Spacing="20">
+                    <!-- Header de búsqueda -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <Border Background="{StaticResource JpBambooBrush}" 
+                                    CornerRadius="20" 
+                                    Width="40" Height="40">
+                                <TextBlock Text="&#xE721;" 
+                                           Style="{StaticResource JpIcon}" 
+                                           Foreground="White" 
+                                           FontSize="16"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Búsqueda de Empleados" Style="{StaticResource JpCardTitle}"/>
+                                <TextBlock Text="Busca por nombre, email o usuario" 
+                                           Style="{StaticResource JpCardDescription}" 
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Bottom">
+                            <TextBox Width="300" 
+                                     PlaceholderText="🔍 Buscar empleado..."
+                                     Style="{StaticResource JpTextBox}"
+                                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Content="Buscar"
+                                    Style="{StaticResource JpSecondaryButton}"
+                                    Command="{Binding SearchCommand}"
+                                    Width="120"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Resultados de búsqueda -->
+                    <Border Background="{StaticResource JpSurfaceBrush}" 
+                            CornerRadius="{StaticResource JpRadiusM}" 
+                            BorderBrush="{StaticResource JpLineBrush}"
+                            BorderThickness="1">
+                        <ListView ItemsSource="{Binding Employees}"
+                                  SelectedItem="{Binding Selected, Mode=TwoWay}"
+                                  SelectionMode="Single"
+                                  Height="380"
+                                  Style="{StaticResource JpListView}">
+                            <!-- Same template as list view -->
+                            <ListView.Header>
+                                <Border Background="{StaticResource JpBambooBrush}" 
+                                        CornerRadius="8,8,0,0" 
+                                        Padding="12,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="1.5*"/>
+                                            <ColumnDefinition Width="2.5*"/>
+                                            <ColumnDefinition Width="1.8*"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="ID" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="1" Text="Nombre Completo" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="2" Text="Rol" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="3" Text="Email" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="4" Text="Teléfono" FontWeight="SemiBold" Foreground="White"/>
+                                        <TextBlock Grid.Column="5" Text="Estado" FontWeight="SemiBold" Foreground="White"/>
+                                    </Grid>
+                                </Border>
+                            </ListView.Header>
+
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12,8" 
+                                            Background="Transparent"
+                                            CornerRadius="{StaticResource JpRadiusS}"
+                                            Margin="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="3*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.8*"/>
+                                                <ColumnDefinition Width="100"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Background="{StaticResource JpCrimsonBrush}" 
+                                                    CornerRadius="12" 
+                                                    Width="24" Height="24" 
+                                                    HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding IdEmployee}" 
+                                                           Foreground="White" 
+                                                           FontSize="12" 
+                                                           FontWeight="SemiBold" 
+                                                           HorizontalAlignment="Center" 
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" FontWeight="SemiBold"/>
+                                            <Border Grid.Column="2" 
+                                                    Background="{StaticResource JpBambooBrush}" 
+                                                    CornerRadius="10" 
+                                                    Padding="8,4" 
+                                                    HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding Role}" 
+                                                           Foreground="White" 
+                                                           FontSize="12" 
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="3" Text="{Binding Email}" Foreground="{StaticResource JpMutedBrush}"/>
+                                            <TextBlock Grid.Column="4" Text="{Binding Phone}" Foreground="{StaticResource JpMutedBrush}"/>
+                                            <Border Grid.Column="5" 
+                                                    Background="{StaticResource JpAccentBrush}" 
+                                                    CornerRadius="10" 
+                                                    Padding="6,4" 
+                                                    HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding IsActive}" 
+                                                           Foreground="White" 
+                                                           FontSize="11" 
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Border>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ========== ACTUALIZACIÓN ========== -->
+            <Border Grid.Column="0" Style="{StaticResource JpAdminCard}" Visibility="{Binding UpdateVisibility}">
+                <StackPanel Spacing="20">
+                    <!-- Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Background="{StaticResource JpAccentBrush}" 
+                                CornerRadius="20" 
+                                Width="40" Height="40">
+                            <TextBlock Text="&#xE70F;" 
+                                       Style="{StaticResource JpIcon}" 
+                                       Foreground="White" 
+                                       FontSize="16"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Actualizar Empleado" Style="{StaticResource JpCardTitle}"/>
+                            <TextBlock Text="Edita la información del personal" 
+                                       Style="{StaticResource JpCardDescription}" 
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Búsqueda por ID -->
+                    <Border Background="{StaticResource JpSurfaceBrush}" 
+                            CornerRadius="{StaticResource JpRadiusM}" 
+                            Padding="16"
+                            BorderBrush="{StaticResource JpLineBrush}"
+                            BorderThickness="1">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Buscar empleado:" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox Width="120" 
+                                         PlaceholderText="ID empleado"
+                                         Style="{StaticResource JpTextBox}"
+                                         Text="{Binding IdLookup, Mode=TwoWay}"/>
+                                <Button Content="Cargar"
+                                        Style="{StaticResource JpPrimaryButton}"
+                                        Command="{Binding LoadByIdCommand}"
+                                        Width="100"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Formulario de edición -->
+                    <StackPanel Spacing="16">
+                        <!-- ID (solo lectura) -->
+                        <TextBox PlaceholderText="ID del empleado" 
+                                 IsReadOnly="True"
+                                 Style="{StaticResource JpTextBox}"
+                                 Text="{Binding Editing.IdEmployee}"
+                                 Opacity="0.7"/>
+
+                        <TextBox PlaceholderText="📝 Nombre completo" 
+                                 Style="{StaticResource JpTextBox}"
+                                 Text="{Binding Editing.FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <ComboBox SelectedItem="{Binding Editing.Role, Mode=TwoWay}" 
+                                  PlaceholderText="👤 Selecciona el rol"
+                                  Background="{StaticResource JpSurfaceBrush}"
+                                  BorderBrush="{StaticResource JpLineBrush}"
+                                  BorderThickness="2"
+                                  CornerRadius="{StaticResource JpRadiusM}"
+                                  Padding="16,12"
+                                  FontSize="16">
+                            <x:String>Admin</x:String>
+                            <x:String>Empleado</x:String>
+                        </ComboBox>
+
+                        <TextBox PlaceholderText="📧 Email" 
+                                 Style="{StaticResource JpTextBox}"
+                                 Text="{Binding Editing.Email, Mode=TwoWay}"/>
+
+                        <TextBox PlaceholderText="📱 Teléfono" 
+                                 Style="{StaticResource JpTextBox}"
+                                 Text="{Binding Editing.Phone, Mode=TwoWay}"/>
+
+                        <CheckBox Content="✅ Empleado activo" 
+                                  IsChecked="{Binding Editing.IsActive, Mode=TwoWay}"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <!-- Botones de acción -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Content="➕ Nuevo"   
+                                Style="{StaticResource JpSecondaryButton}" 
+                                Command="{Binding NewCommand}"
+                                Width="120"/>
+                        <Button Content="💾 Guardar" 
+                                Style="{StaticResource JpPrimaryButton}" 
+                                Command="{Binding SaveCommand}"
+                                Width="120"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ========== DAR DE BAJA ========== -->
+            <Border Grid.Column="1" Style="{StaticResource JpAdminCard}" Visibility="{Binding DeleteVisibility}">
+                <StackPanel Spacing="20">
+                    <!-- Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Background="{StaticResource JpMutedBrush}" 
+                                CornerRadius="20" 
+                                Width="40" Height="40">
+                            <TextBlock Text="&#xE74D;" 
+                                       Style="{StaticResource JpIcon}" 
+                                       Foreground="White" 
+                                       FontSize="16"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Dar de Baja" Style="{StaticResource JpCardTitle}"/>
+                            <TextBlock Text="Inactivar empleado (soft delete)" 
+                                       Style="{StaticResource JpCardDescription}" 
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Advertencia -->
+                    <Border Background="#33FF6B6B" 
+                            CornerRadius="{StaticResource JpRadiusM}" 
+                            Padding="16"
+                            BorderBrush="{StaticResource JpAccentBrush}"
+                            BorderThickness="1">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="⚠️" FontSize="20"/>
+                                <TextBlock Text="Advertencia" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="{StaticResource JpCrimsonBrush}"/>
+                            </StackPanel>
+                            <TextBlock Text="Esta acción inactivará al empleado pero mantendrá su información en el sistema para propósitos de auditoría."
+                                       TextWrapping="Wrap"
+                                       FontSize="14"
+                                       Foreground="{StaticResource JpMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Formulario de baja -->
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Selecciona de la lista o ingresa el ID:" FontWeight="SemiBold"/>
+                        
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="160" 
+                                     PlaceholderText="ID del empleado"
+                                     Style="{StaticResource JpTextBox}"
+                                     Text="{Binding IdLookup, Mode=TwoWay}"/>
+                            <Button Content="❌ Inactivar Empleado"
+                                    Style="{StaticResource JpPrimaryButton}"
+                                    Command="{Binding SoftDeleteCommand}"
+                                    Width="180"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
