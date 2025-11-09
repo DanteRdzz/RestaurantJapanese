@@ -107,65 +107,65 @@
                     </StackPanel>
                 </Border>
 
-                <!-- CARD: Productos (pendiente) -->
-                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource JpAdminCard}" Margin="6" Opacity="0.8">
+                <!-- CARD: Inventario (MENÚ) — ACTIVO -->
+                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource JpAdminCard}" Margin="6">
                     <StackPanel Spacing="14">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="{StaticResource JpMutedBrush}" CornerRadius="24" Width="48" Height="48" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE7C7;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Background="{StaticResource JpAccentBrush}" CornerRadius="24" Width="48" Height="48" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE7C7;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="18"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Gestión de Productos" Style="{StaticResource JpCardTitle}"/>
-                                <TextBlock Text="Próximamente"
-                                           Foreground="{StaticResource JpMutedBrush}" FontSize="12" FontWeight="SemiBold"/>
+                                <TextBlock Text="Gestión de Productos (Inventario)" Style="{StaticResource JpCardTitle}"/>
+                                <TextBlock Text="Módulo Activo" Foreground="{StaticResource JpBambooBrush}"
+                           FontSize="12" FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
 
-                        <TextBlock Text="Administra el menú: platillos, precios, categorías y disponibilidad."
-                                   Style="{StaticResource JpCardDescription}"
-                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="Administra el menú: platillos, precios y disponibilidad."
+                   Style="{StaticResource JpCardDescription}" TextWrapping="Wrap"/>
 
                         <Rectangle Height="1" Fill="{StaticResource JpLineBrush}" Margin="0,4"/>
 
-                        <Button Content="En desarrollo"
-                                Style="{StaticResource JpPrimaryButton}"
-                                HorizontalAlignment="Stretch"
-                                IsEnabled="False">
-                            <ToolTipService.ToolTip>
-                                <ToolTip Content="Este módulo estará disponible próximamente" />
-                            </ToolTipService.ToolTip>
-                        </Button>
+                        <Button Content="Abrir Inventario"
+                Style="{StaticResource JpPrimaryButton}"
+                HorizontalAlignment="Stretch"
+                Command="{Binding OpenInventoryCommand}"/>
                     </StackPanel>
                 </Border>
 
-                <!-- CARD: Reportes (pendiente) -->
-                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource JpAdminCard}" Margin="6" Opacity="0.8">
-                    <StackPanel Spacing="14">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="{StaticResource JpMutedBrush}" CornerRadius="24" Width="48" Height="48" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE9D2;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <!-- Análisis y Reportes (ACTIVO) -->
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource JpAdminCard}">
+                    <StackPanel Spacing="20">
+                        <!-- Header con ícono -->
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{StaticResource JpMutedBrush}"
+                    CornerRadius="25"
+                    Width="50" Height="50">
+                                <TextBlock Text="&#xE9D2;"
+                           Style="{StaticResource JpIcon}"
+                           Foreground="White"
+                           FontSize="20"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Análisis y Reportes" Style="{StaticResource JpCardTitle}"/>
-                                <TextBlock Text="Próximamente"
-                                           Foreground="{StaticResource JpMutedBrush}" FontSize="12" FontWeight="SemiBold"/>
+                                <TextBlock Text="Análisis y Reportes"
+                           Style="{StaticResource JpCardTitle}"/>
+                                <TextBlock Text="Ventas por día, semana y mes"
+                           Foreground="{StaticResource JpBambooBrush}"
+                           FontSize="12"
+                           FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
 
-                        <TextBlock Text="Reportes de ventas por período, productos top y ticket promedio."
-                                   Style="{StaticResource JpCardDescription}"
-                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="Consulta gráficos y tablas de ventas. Filtra por día/semana/mes y exporta."
+                   Style="{StaticResource JpCardDescription}"/>
 
-                        <Rectangle Height="1" Fill="{StaticResource JpLineBrush}" Margin="0,4"/>
+                        <Rectangle Height="1" Fill="{StaticResource JpLineBrush}" Margin="0,8"/>
 
-                        <Button Content="En desarrollo"
-                                Style="{StaticResource JpPrimaryButton}"
-                                HorizontalAlignment="Stretch"
-                                IsEnabled="False">
-                            <ToolTipService.ToolTip>
-                                <ToolTip Content="Este módulo estará disponible próximamente" />
-                            </ToolTipService.ToolTip>
-                        </Button>
+                        <!-- BOTÓN ACTIVO -->
+                        <Button Style="{StaticResource JpPrimaryButton}"
+                Content="Abrir Reportes"
+                Command="{Binding OpenSalesReportCommand}"/>
                     </StackPanel>
                 </Border>
             </Grid>

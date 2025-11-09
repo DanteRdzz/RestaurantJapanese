@@ -291,6 +291,147 @@ BEGIN
 END
 GO
 
+/* Reportes */
+CREATE PROCEDURE [dbo].[sp_RestJP_Sales_Report]
+  @From     DATE        = NULL,      -- inicio (incluyente). Si es NULL: últimos 30 días
+  @To       DATE        = NULL,      -- fin (incluyente). Si es NULL: hoy
+  @GroupBy  NVARCHAR(10) = N'DAY'    -- 'DAY' | 'WEEK' | 'MONTH'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    ------------------------------------------------------------
+    -- 1) Rango por defecto: últimos 30 días hasta hoy
+    ------------------------------------------------------------
+    IF @To   IS NULL SET @To   = CONVERT(date, SYSDATETIME());
+    IF @From IS NULL SET @From = DATEADD(DAY, -30, @To);
+
+    ------------------------------------------------------------
+    -- 2) Filtrado base (t.CreatedAt en [@From, @To+1))
+    ------------------------------------------------------------
+    ;WITH src AS (
+        SELECT
+            t.CreatedAt,
+            t.Subtotal,
+            t.Tax,
+            t.Tip,
+            t.Total
+        FROM dbo.Tickets AS t
+        WHERE t.CreatedAt >= @From
+          AND t.CreatedAt <  DATEADD(DAY, 1, @To) -- fin exclusivo
+    ),
+    buckets AS (
+        SELECT
+            CASE UPPER(@GroupBy)
+                WHEN 'DAY' THEN
+                    CAST(CAST(s.CreatedAt AS date) AS datetime2(0))
+
+                WHEN 'WEEK' THEN
+                    -- Lunes de esa semana (independiente de SET DATEFIRST)
+                    CAST(
+                        DATEADD(DAY,
+                                -((DATEDIFF(DAY, 0, CAST(s.CreatedAt AS date)) + 6) % 7),
+                                CAST(s.CreatedAt AS date)
+                        ) AS datetime2(0)
+                    )
+
+                WHEN 'MONTH' THEN
+                    CAST(DATEFROMPARTS(YEAR(s.CreatedAt), MONTH(s.CreatedAt), 1) AS datetime2(0))
+
+                ELSE
+                    CAST(CAST(s.CreatedAt AS date) AS datetime2(0))
+            END AS BucketStart,
+            s.Subtotal,
+            s.Tax,
+            s.Tip,
+            s.Total
+        FROM src AS s
+    )
+    SELECT
+        b.BucketStart,                                         -- clave de agrupación (inicio de período)
+        -- Etiqueta legible
+        CASE UPPER(@GroupBy)
+            WHEN 'DAY'   THEN CONVERT(nvarchar(10), b.BucketStart, 120)                       -- yyyy-MM-dd
+            WHEN 'WEEK'  THEN CONCAT(CONVERT(nvarchar(10), b.BucketStart, 120), ' - ',
+                                     CONVERT(nvarchar(10), DATEADD(DAY, 6, b.BucketStart), 120))
+            WHEN 'MONTH' THEN CONCAT(DATENAME(YEAR, b.BucketStart), '-',
+                                     RIGHT('0' + CONVERT(varchar(2), DATEPART(MONTH, b.BucketStart)), 2))
+            ELSE CONVERT(nvarchar(10), b.BucketStart, 120)
+        END AS Label,
+        COUNT(*)                 AS Tickets,
+        SUM(b.Subtotal)          AS Subtotal,
+        SUM(b.Tax)               AS IVA,
+        SUM(b.Tip)               AS Propina,
+        SUM(b.Total)             AS Total
+    FROM buckets AS b
+    GROUP BY b.BucketStart
+    ORDER BY b.BucketStart;
+END
+GO
+
+-- CREAR
+CREATE OR ALTER PROCEDURE dbo.sp_Menu_Create
+  @Name        NVARCHAR(100),
+  @Description NVARCHAR(250) = NULL,
+  @Price       DECIMAL(10,2),
+  @IsActive    BIT = 1
+AS
+BEGIN
+  SET NOCOUNT ON;
+  SET @Name = LTRIM(RTRIM(@Name));
+  IF (@Name = '') BEGIN RAISERROR('Name es requerido.',16,1); RETURN; END
+  IF (@Price < 0) BEGIN RAISERROR('Price inválido.',16,1); RETURN; END
+
+  INSERT INTO dbo.MenuItems (Name, Description, Price, IsActive)
+  VALUES (@Name, NULLIF(@Description,''), @Price, @IsActive);
+
+  DECLARE @Id INT = SCOPE_IDENTITY();
+  EXEC dbo.sp_Menu_GetById @IdMenuItem = @Id;
+END
+GO
+
+-- ACTUALIZAR
+CREATE OR ALTER PROCEDURE dbo.sp_Menu_Update
+  @IdMenuItem  INT,
+  @Name        NVARCHAR(100),
+  @Description NVARCHAR(250) = NULL,
+  @Price       DECIMAL(10,2),
+  @IsActive    BIT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  IF NOT EXISTS(SELECT 1 FROM dbo.MenuItems WHERE IdMenuItem = @IdMenuItem)
+  BEGIN RAISERROR('Item no encontrado.',16,1); RETURN; END
+
+  SET @Name = LTRIM(RTRIM(@Name));
+  IF (@Name='') BEGIN RAISERROR('Name es requerido.',16,1); RETURN; END
+  IF (@Price < 0) BEGIN RAISERROR('Price inválido.',16,1); RETURN; END
+
+  UPDATE dbo.MenuItems
+  SET Name=@Name,
+      Description = NULLIF(@Description,''),
+      Price=@Price,
+      IsActive=@IsActive
+  WHERE IdMenuItem=@IdMenuItem;
+
+  EXEC dbo.sp_Menu_GetById @IdMenuItem;
+END
+GO
+
+-- BAJA LÓGICA (soft delete = IsActive=0)
+CREATE OR ALTER PROCEDURE dbo.sp_Menu_SoftDelete
+  @IdMenuItem INT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  IF NOT EXISTS(SELECT 1 FROM dbo.MenuItems WHERE IdMenuItem=@IdMenuItem)
+  BEGIN RAISERROR('Item no encontrado.',16,1); RETURN; END
+
+  UPDATE dbo.MenuItems SET IsActive=0 WHERE IdMenuItem=@IdMenuItem;
+  EXEC dbo.sp_Menu_GetById @IdMenuItem;
+END
+GO
+
 /*5. Datos iniciales (seed idempotente) */
 PRINT 'Seed de MenuItems...';
 IF NOT EXISTS (SELECT 1 FROM dbo.MenuItems WHERE Name=N'Ramen Shoyu')
