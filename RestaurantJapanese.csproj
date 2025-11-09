@@ -16,6 +16,7 @@
     <None Remove="db.local.json" />
     <None Remove="Views\AdminEmployeesMenuView.xaml" />
     <None Remove="Views\AdminMenuView.xaml" />
+    <None Remove="Views\MenuInventarioAdminView.xaml" />
     <None Remove="Views\PosView.xaml" />
     <None Remove="Views\ReportsView.xaml" />
   </ItemGroup>
@@ -54,6 +55,12 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Page Update="Views\MenuInventarioAdminView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   
   <ItemGroup>

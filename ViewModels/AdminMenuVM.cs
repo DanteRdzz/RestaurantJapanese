@@ -66,8 +66,11 @@ namespace RestaurantJapanese.ViewModels
         });
 
         // ===== Placeholders (productos, etc.) =====
-        public ICommand OpenProductsCommand => new RelayCommand(async _ => await PendingAsync("Gestión de Productos"));
-
+        public ICommand OpenInventoryCommand => new RelayCommand(_ =>
+        {
+            var win = NavigationHelper.OpenWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>();
+            win.Activate();
+        });
         private async Task PendingAsync(string module)
         {
             var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
