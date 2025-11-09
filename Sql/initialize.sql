@@ -369,6 +369,69 @@ BEGIN
 END
 GO
 
+-- CREAR
+CREATE OR ALTER PROCEDURE dbo.sp_Menu_Create
+  @Name        NVARCHAR(100),
+  @Description NVARCHAR(250) = NULL,
+  @Price       DECIMAL(10,2),
+  @IsActive    BIT = 1
+AS
+BEGIN
+  SET NOCOUNT ON;
+  SET @Name = LTRIM(RTRIM(@Name));
+  IF (@Name = '') BEGIN RAISERROR('Name es requerido.',16,1); RETURN; END
+  IF (@Price < 0) BEGIN RAISERROR('Price inválido.',16,1); RETURN; END
+
+  INSERT INTO dbo.MenuItems (Name, Description, Price, IsActive)
+  VALUES (@Name, NULLIF(@Description,''), @Price, @IsActive);
+
+  DECLARE @Id INT = SCOPE_IDENTITY();
+  EXEC dbo.sp_Menu_GetById @IdMenuItem = @Id;
+END
+GO
+
+-- ACTUALIZAR
+CREATE OR ALTER PROCEDURE dbo.sp_Menu_Update
+  @IdMenuItem  INT,
+  @Name        NVARCHAR(100),
+  @Description NVARCHAR(250) = NULL,
+  @Price       DECIMAL(10,2),
+  @IsActive    BIT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  IF NOT EXISTS(SELECT 1 FROM dbo.MenuItems WHERE IdMenuItem = @IdMenuItem)
+  BEGIN RAISERROR('Item no encontrado.',16,1); RETURN; END
+
+  SET @Name = LTRIM(RTRIM(@Name));
+  IF (@Name='') BEGIN RAISERROR('Name es requerido.',16,1); RETURN; END
+  IF (@Price < 0) BEGIN RAISERROR('Price inválido.',16,1); RETURN; END
+
+  UPDATE dbo.MenuItems
+  SET Name=@Name,
+      Description = NULLIF(@Description,''),
+      Price=@Price,
+      IsActive=@IsActive
+  WHERE IdMenuItem=@IdMenuItem;
+
+  EXEC dbo.sp_Menu_GetById @IdMenuItem;
+END
+GO
+
+-- BAJA LÓGICA (soft delete = IsActive=0)
+CREATE OR ALTER PROCEDURE dbo.sp_Menu_SoftDelete
+  @IdMenuItem INT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  IF NOT EXISTS(SELECT 1 FROM dbo.MenuItems WHERE IdMenuItem=@IdMenuItem)
+  BEGIN RAISERROR('Item no encontrado.',16,1); RETURN; END
+
+  UPDATE dbo.MenuItems SET IsActive=0 WHERE IdMenuItem=@IdMenuItem;
+  EXEC dbo.sp_Menu_GetById @IdMenuItem;
+END
+GO
+
 /*5. Datos iniciales (seed idempotente) */
 PRINT 'Seed de MenuItems...';
 IF NOT EXISTS (SELECT 1 FROM dbo.MenuItems WHERE Name=N'Ramen Shoyu')
