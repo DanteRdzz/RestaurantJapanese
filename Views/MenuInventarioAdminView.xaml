@@ -7,6 +7,7 @@
     <!-- Conversor de moneda para la lista -->
     <UserControl.Resources>
         <helpers:CurrencyConverterHelper x:Key="CurrencyConverter"/>
+        <helpers:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource JpGradientBg}" Padding="28">
@@ -180,6 +181,23 @@
                         <TextBlock Text="Editar / Crear" Style="{StaticResource JpCardTitle}" VerticalAlignment="Center"/>
                     </StackPanel>
 
+                    <!-- Área de errores -->
+                    <Border Grid.Row="0" 
+                            Background="{StaticResource JpCrimsonBrush}" 
+                            CornerRadius="8" 
+                            Padding="12,8"
+                            Margin="0,8,0,0"
+                            Visibility="{Binding Error, Converter={StaticResource StringToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠️" FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Error}" 
+                                       Foreground="White" 
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Campos con scroll -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="14">
@@ -194,9 +212,10 @@
                                      AcceptsReturn="True"
                                      Height="90"/>
 
-                            <NumberBox PlaceholderText="Precio"
-                                       Minimum="0"
-                                       Value="{Binding Price, Mode=TwoWay}"/>
+                            <TextBox PlaceholderText="Precio (ej: 100.50)"
+                                     Style="{StaticResource JpTextBox}"
+                                     Text="{Binding PriceText, Mode=TwoWay}"
+                                     InputScope="Number"/>
 
                             <CheckBox Content="Producto activo"
                                       IsChecked="{Binding IsActive, Mode=TwoWay}"
