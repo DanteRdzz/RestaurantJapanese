@@ -62,6 +62,25 @@ namespace RestaurantJapanese.ViewModels
             set => Set(ref _price, value); 
         }
 
+        // Propiedad auxiliar para el binding del TextBox de precio
+        public string PriceText
+        {
+            get => _price.ToString("0.##");
+            set
+            {
+                if (decimal.TryParse(value, out var result) && result >= 0)
+                {
+                    Set(ref _price, result);
+                }
+                else if (string.IsNullOrWhiteSpace(value))
+                {
+                    Set(ref _price, 0m);
+                }
+                // Si no se puede parsear, mantiene el valor actual sin cambios
+                OnPropertyChanged(); // Notifica el cambio de PriceText
+            }
+        }
+
         private bool _isActive = true;
         public bool IsActive 
         { 
@@ -81,9 +100,20 @@ namespace RestaurantJapanese.ViewModels
         public async Task LoadAsync()
         {
             Error = null;
-            Items.Clear();
-            var list = await _svc.GetAllAsync(OnlyActive, string.IsNullOrWhiteSpace(Search) ? null : Search!.Trim());
-            foreach (var it in list) Items.Add(it);
+            try
+            {
+                Items.Clear();
+                var list = await _svc.GetAllAsync(OnlyActive, string.IsNullOrWhiteSpace(Search) ? null : Search!.Trim());
+                foreach (var it in list) Items.Add(it);
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex)
+            {
+                Error = $"Error SQL al cargar datos ({ex.Number}): {ex.Message}";
+            }
+            catch (System.Exception ex)
+            {
+                Error = $"Error al cargar datos: {ex.Message}";
+            }
         }
 
         private void LoadToForm(MenuItemModel? m)
@@ -94,6 +124,8 @@ namespace RestaurantJapanese.ViewModels
             Description = m.Description;
             Price = m.Price;
             IsActive = m.IsActive;
+            // Notificar cambio en PriceText después de actualizar Price
+            OnPropertyChanged(nameof(PriceText));
         }
 
         private void ClearForm()
@@ -106,6 +138,7 @@ namespace RestaurantJapanese.ViewModels
             // Fix: Set backing field directly to avoid recursive loop
             _selected = null;
             OnPropertyChanged(nameof(Selected));
+            OnPropertyChanged(nameof(PriceText));
         }
 
         private async Task SaveAsync()
@@ -114,47 +147,94 @@ namespace RestaurantJapanese.ViewModels
             if (string.IsNullOrWhiteSpace(Name)) { Error = "Nombre es requerido."; return; }
             if (Price < 0) { Error = "Precio inválido."; return; }
 
-            var dto = new MenuItemModel
+            try
             {
-                IdMenuItem = IdMenuItem,
-                Name = Name.Trim(),
-                Description = string.IsNullOrWhiteSpace(Description) ? null : Description!.Trim(),
-                Price = Price,
-                IsActive = IsActive
-            };
-
-            if (dto.IdMenuItem == 0)
-            {
-                var created = await _svc.CreateAsync(dto);
-                Items.Add(created);
-                Selected = created;
-            }
-            else
-            {
-                var updated = await _svc.UpdateAsync(dto);
-                var row = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
-                if (row != null)
+                var dto = new MenuItemModel
                 {
-                    var idx = Items.IndexOf(row);
-                    Items[idx] = updated;
+                    IdMenuItem = IdMenuItem,
+                    Name = Name.Trim(),
+                    Description = string.IsNullOrWhiteSpace(Description) ? null : Description!.Trim(),
+                    Price = Price,
+                    IsActive = IsActive
+                };
+
+                if (dto.IdMenuItem == 0)
+                {
+                    // Crear nuevo elemento
+                    var created = await _svc.CreateAsync(dto);
+                    if (created != null)
+                    {
+                        Items.Add(created);
+                        Selected = created;
+                        Error = null; // Éxito
+                    }
+                    else
+                    {
+                        Error = "No se pudo crear el elemento del menú.";
+                    }
                 }
-                Selected = updated;
+                else
+                {
+                    // Actualizar elemento existente
+                    var updated = await _svc.UpdateAsync(dto);
+                    if (updated != null)
+                    {
+                        var row = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
+                        if (row != null)
+                        {
+                            var idx = Items.IndexOf(row);
+                            Items[idx] = updated;
+                        }
+                        Selected = updated;
+                        Error = null; // Éxito
+                    }
+                    else
+                    {
+                        Error = "No se pudo actualizar el elemento del menú.";
+                    }
+                }
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex)
+            {
+                Error = $"Error SQL ({ex.Number}): {ex.Message}";
+            }
+            catch (System.Exception ex)
+            {
+                Error = $"Error: {ex.Message}";
             }
         }
 
         private async Task SoftDeleteAsync()
         {
             if (IdMenuItem <= 0) { Error = "Selecciona un producto."; return; }
-            var updated = await _svc.SoftDeleteAsync(IdMenuItem);
-            if (updated != null)
+            
+            Error = null;
+            try
             {
-                var row = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
-                if (row != null)
+                var updated = await _svc.SoftDeleteAsync(IdMenuItem);
+                if (updated != null)
                 {
-                    var idx = Items.IndexOf(row);
-                    Items[idx] = updated; // ahora IsActive=false
+                    var row = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
+                    if (row != null)
+                    {
+                        var idx = Items.IndexOf(row);
+                        Items[idx] = updated; // ahora IsActive=false
+                    }
+                    Selected = updated;
+                    Error = null; // Éxito
                 }
-                Selected = updated;
+                else
+                {
+                    Error = "No se pudo dar de baja el elemento del menú.";
+                }
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex)
+            {
+                Error = $"Error SQL al dar de baja ({ex.Number}): {ex.Message}";
+            }
+            catch (System.Exception ex)
+            {
+                Error = $"Error al dar de baja: {ex.Message}";
             }
         }
     }
