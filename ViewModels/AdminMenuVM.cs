@@ -22,17 +22,10 @@ namespace RestaurantJapanese.ViewModels
         // ===== Empleados =====
         public ICommand OpenEmployeesCommand => new RelayCommand(_ =>
         {
-            if (OwnWindow is not null)
-            {
-                NavigationHelper.ReplaceWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
-                    OwnWindow, parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
-            }
-            else
-            {
-                var win = NavigationHelper.OpenWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
-                    parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
-                win.Activate();
-            }
+            // Siempre abrir nueva ventana para empleados
+            var win = NavigationHelper.OpenWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
+                parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
+            win.Activate();
         });
 
         // ===== POS =====
@@ -52,17 +45,10 @@ namespace RestaurantJapanese.ViewModels
         // ===== Reportes =====
         public ICommand OpenSalesReportCommand => new RelayCommand(_ =>
         {
-            if (OwnWindow is not null)
-            {
-                NavigationHelper.ReplaceWindow<Views.ReportsView, ReportsVM>(
-                    OwnWindow, parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
-            }
-            else
-            {
-                var win = NavigationHelper.OpenWindow<Views.ReportsView, ReportsVM>(
-                    parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
-                win.Activate();
-            }
+            // Siempre abrir nueva ventana para reportes
+            var win = NavigationHelper.OpenWindow<Views.ReportsView, ReportsVM>(
+                parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
+            win.Activate();
         });
 
         // ===== Placeholders (productos, etc.) =====
@@ -71,6 +57,7 @@ namespace RestaurantJapanese.ViewModels
             var win = NavigationHelper.OpenWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>();
             win.Activate();
         });
+
         private async Task PendingAsync(string module)
         {
             var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;

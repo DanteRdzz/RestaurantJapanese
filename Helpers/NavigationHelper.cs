@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
@@ -18,6 +19,11 @@ namespace RestaurantJapanese.Helpers
 
             return Services.GetRequiredService<T>();
         }
+
+        /// <summary>
+        /// Obtiene la lista de todas las ventanas abiertas.
+        /// </summary>
+        public static IReadOnlyList<Window> OpenWindows => _openWindows.AsReadOnly();
 
         /// <summary>
         /// Abre una nueva Window con la View/VM del contenedor (sin parámetros).
@@ -85,6 +91,43 @@ namespace RestaurantJapanese.Helpers
             init?.Invoke(vm, owner);
 
             return owner;
+        }
+
+        /// <summary>
+        /// Verifica si ya existe una ventana con el tipo de View especificado.
+        /// </summary>
+        public static bool HasWindowOfType<TView>() where TView : FrameworkElement
+        {
+            return _openWindows.Any(w => w.Content is TView);
+        }
+
+        /// <summary>
+        /// Obtiene la primera ventana que contiene el tipo de View especificado, o null si no existe.
+        /// </summary>
+        public static Window? GetWindowOfType<TView>() where TView : FrameworkElement
+        {
+            return _openWindows.FirstOrDefault(w => w.Content is TView);
+        }
+
+        /// <summary>
+        /// Abre una nueva ventana solo si no existe ya una del mismo tipo. Si existe, la activa.
+        /// </summary>
+        public static Window OpenOrActivateWindow<TView, TViewModel>(
+            object? parameter = null,
+            Action<TViewModel, Window>? init = null)
+            where TView : FrameworkElement
+            where TViewModel : class
+        {
+            var existingWindow = GetWindowOfType<TView>();
+            if (existingWindow != null)
+            {
+                existingWindow.Activate();
+                return existingWindow;
+            }
+
+            var newWindow = OpenWindow<TView, TViewModel>(parameter, init);
+            newWindow.Activate();
+            return newWindow;
         }
     }
 }
