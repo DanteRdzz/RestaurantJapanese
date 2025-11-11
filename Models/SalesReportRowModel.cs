@@ -1,13 +1,16 @@
-﻿namespace RestaurantJapanese.Models
+﻿using System;
+
+namespace RestaurantJapanese.Models
 {
     public class SalesReportRowModel
     {
-        public System.DateTime BucketStart { get; set; }
-        public string Label { get; set; } = "";
-        public int Tickets { get; set; }
-        public decimal Subtotal { get; set; }
-        public decimal IVA { get; set; }
-        public decimal Propina { get; set; }
-        public decimal Total { get; set; }
+        public int IdTicket { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public int Subtotal { get; set; }
+        public int Tax { get; set; }
+        public int Total { get; set; }
+
+        // Propiedades calculadas para la UI
+        public string FormattedDate => CreatedAt.ToString("dd/MM/yyyy HH:mm");
     }
 }

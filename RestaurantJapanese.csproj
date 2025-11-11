@@ -18,7 +18,7 @@
     <None Remove="Views\AdminMenuView.xaml" />
     <None Remove="Views\MenuInventarioAdminView.xaml" />
     <None Remove="Views\PosView.xaml" />
-    <None Remove="Views\ReportsView.xaml" />
+    <None Remove="Views\ReportsPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,13 +59,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Page Update="Views\MenuInventarioAdminView.xaml">
+    <Page Update="Views\ReportsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   
   <ItemGroup>
-    <Page Update="Views\ReportsView.xaml">
+    <Page Update="Views\MenuInventarioAdminView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

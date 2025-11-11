@@ -7,6 +7,6 @@ namespace RestaurantJapanese.Repository.Interfaces
 {
     public interface IReportsRepository
     {
-        Task<IEnumerable<SalesReportRowModel>> GetSalesAsync(DateTime? from, DateTime? to, string groupBy);
+        Task<List<SalesReportRowModel>> GetSalesAsync(DateTime? FechaInicio, DateTime? FechaFin);
     }
 }

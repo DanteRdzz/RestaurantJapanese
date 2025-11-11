@@ -45,11 +45,17 @@ namespace RestaurantJapanese.ViewModels
         // ===== Reportes =====
         public ICommand OpenSalesReportCommand => new RelayCommand(_ =>
         {
-            // Siempre abrir nueva ventana para reportes
-            var win = NavigationHelper.OpenWindow<Views.ReportsView, ReportsVM>(
-                parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
+            var win = NavigationHelper.OpenWindow<Views.ReportsPage, ReportsVM>(
+                parameter: null,
+                init: (vm, w) =>
+                {
+                    vm.OwnWindow = w;
+                    _ = vm.LoadAsync();
+                });
             win.Activate();
         });
+
+
 
         // ===== Placeholders (productos, etc.) =====
         public ICommand OpenInventoryCommand => new RelayCommand(_ =>

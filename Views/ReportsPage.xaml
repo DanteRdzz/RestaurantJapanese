@@ -1,0 +1,56 @@
+<Page
+    x:Class="RestaurantJapanese.Views.ReportsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:RestaurantJapanese.Models">
+
+    <Grid Padding="12" RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Filtros y acciones -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Desde:" VerticalAlignment="Center"/>
+            <DatePicker Width="200"
+                        Date="{Binding FromDateOffset, Mode=TwoWay}"/>
+
+            <TextBlock Text="Hasta:" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <DatePicker Width="200"
+                        Date="{Binding ToDateOffset, Mode=TwoWay}"/>
+
+            <Button Content="Cargar" Margin="12,0,0,0"
+                    Command="{Binding LoadCommand}"/>
+
+            <Button Content="Hoy" Margin="8,0,0,0"
+                    Command="{Binding QuickTodayCommand}"/>
+
+            <Button Content="Últimos 30" Margin="8,0,0,0"
+                    Command="{Binding QuickLast30Command}"/>
+        </StackPanel>
+
+        <!-- Lista de resultados -->
+        <ListView Grid.Row="1" ItemsSource="{Binding Items}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:SalesReportRowModel">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{x:Bind IdTicket}"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind FormattedDate}"/>
+                        <TextBlock Grid.Column="2" Text="{x:Bind Subtotal}"/>
+                        <TextBlock Grid.Column="3" Text="{x:Bind Tax}"/>
+                        <TextBlock Grid.Column="4" Text="{x:Bind Total}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>

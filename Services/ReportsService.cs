@@ -12,16 +12,13 @@ namespace RestaurantJapanese.Services
         private readonly IReportsRepository _repo;
         public ReportsService(IReportsRepository repo) => _repo = repo;
 
-        public async Task<IEnumerable<SalesReportRowModel>> GetSalesAsync(DateTime? from, DateTime? to, string groupBy)
+        public async Task<List<SalesReportRowModel>> GetSalesAsync(DateTime? FechaInicio, DateTime? FechaFin)
         {
             // Defaults si vienen nulos (últimos 30 días)
-            var toUse = to?.Date ?? DateTime.Today;
-            var fromUse = from?.Date ?? toUse.AddDays(-30);
+            var fromUse = FechaInicio?.Date ?? DateTime.Today.AddDays(-30);
+            var toUse = FechaFin?.Date ?? DateTime.Today;
 
-            var gb = (groupBy ?? "DAY").Trim().ToUpperInvariant();
-            if (gb != "DAY" && gb != "WEEK" && gb != "MONTH") gb = "DAY";
-
-            return await _repo.GetSalesAsync(fromUse, toUse, gb);
+            return await _repo.GetSalesAsync(fromUse, toUse);
         }
     }
 }
