@@ -18,6 +18,9 @@ namespace RestaurantJapanese.ViewModels
 
         public Window? OwnWindow { get; set; }
 
+        // Add XamlRoot property to be set by the view
+        public XamlRoot? ViewXamlRoot { get; set; }
+
         // Event to notify view when create finished (success flag, message)
         public event Action<bool, string?>? CreateCompleted;
 
@@ -238,14 +241,14 @@ namespace RestaurantJapanese.ViewModels
             if (!int.TryParse(IdLookup, out var id) || id <= 0)
             { Error = "Id inválido."; return; }
 
-            var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
+            // Use ViewXamlRoot directly instead of trying to get it from OwnWindow
             var confirm = new ContentDialog
             {
                 Title = "Dar de baja",
                 Content = "¿Confirmas dar de baja (inactivar) al empleado?",
                 PrimaryButtonText = "Dar de baja",
                 CloseButtonText = "Cancelar",
-                XamlRoot = root
+                XamlRoot = ViewXamlRoot
             };
             var res = await confirm.ShowAsync();
             if (res != ContentDialogResult.Primary) return;
@@ -293,8 +296,8 @@ namespace RestaurantJapanese.ViewModels
 
         private async Task DialogAsync(string title, string msg)
         {
-            var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
-            var dlg = new ContentDialog { Title = title, Content = msg, CloseButtonText = "OK", XamlRoot = root };
+            // Use ViewXamlRoot directly instead of trying to get it from OwnWindow
+            var dlg = new ContentDialog { Title = title, Content = msg, CloseButtonText = "OK", XamlRoot = ViewXamlRoot };
             await dlg.ShowAsync();
         }
     }
