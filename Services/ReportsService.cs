@@ -14,9 +14,9 @@ namespace RestaurantJapanese.Services
 
         public async Task<List<SalesReportRowModel>> GetSalesAsync(DateTime? FechaInicio, DateTime? FechaFin)
         {
-            // Defaults si vienen nulos (últimos 30 días)
-            var fromUse = FechaInicio?.Date ?? DateTime.Today.AddDays(-30);
-            var toUse = FechaFin?.Date ?? DateTime.Today;
+            // Defaults si vienen nulos (rango amplio para mostrar todos)
+            var fromUse = FechaInicio?.Date ?? new DateTime(2020, 1, 1);
+            var toUse = FechaFin?.Date ?? DateTime.Today.AddDays(1);
 
             return await _repo.GetSalesAsync(fromUse, toUse);
         }

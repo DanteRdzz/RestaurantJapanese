@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Diagnostics; // Para logging de diagnóstico
 
 namespace RestaurantJapanese.ViewModels
 {
@@ -21,9 +22,13 @@ namespace RestaurantJapanese.ViewModels
         {
             _svc = svc;
 
-            // Rango por defecto
-            ToDateOffset = new DateTimeOffset(DateTime.Today);
-            FromDateOffset = ToDateOffset.AddDays(-30);
+            // Rango por defecto: todo el mes actual
+            var today = DateTime.Today;
+            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+            
+            FromDateOffset = new DateTimeOffset(firstDayOfMonth);
+            ToDateOffset = new DateTimeOffset(lastDayOfMonth);
 
             // Carga automática
             _ = LoadAsync();
@@ -47,7 +52,7 @@ namespace RestaurantJapanese.ViewModels
         // Datos
         public ObservableCollection<SalesReportRowModel> Items { get; } = new();
 
-        // Totales (si los quieres)
+        // Totales
         private int _totalTickets;
         public int TotalTickets { get => _totalTickets; set => Set(ref _totalTickets, value); }
 
@@ -65,16 +70,19 @@ namespace RestaurantJapanese.ViewModels
 
         // Comandos
         public ICommand LoadCommand => new RelayCommand(async _ => await LoadAsync());
+        
         public ICommand QuickTodayCommand => new RelayCommand(async _ =>
         {
             FromDateOffset = new DateTimeOffset(DateTime.Today);
             ToDateOffset = new DateTimeOffset(DateTime.Today);
             await LoadAsync();
         });
-        public ICommand QuickLast30Command => new RelayCommand(async _ =>
+        
+        public ICommand QuickAllCommand => new RelayCommand(async _ =>
         {
-            ToDateOffset = new DateTimeOffset(DateTime.Today);
-            FromDateOffset = ToDateOffset.AddDays(-30);
+            // Mostrar todos los registros (un rango muy amplio)
+            FromDateOffset = new DateTimeOffset(new DateTime(2020, 1, 1));
+            ToDateOffset = new DateTimeOffset(DateTime.Today.AddDays(1));
             await LoadAsync();
         });
 
@@ -89,14 +97,26 @@ namespace RestaurantJapanese.ViewModels
                 var from = FromDateOffset.DateTime;
                 var to = ToDateOffset.DateTime;
 
-                var data = await _svc.GetSalesAsync(from, to);
-                foreach (var r in data) Items.Add(r);
+                Debug.WriteLine($"ReportsVM.LoadAsync: Cargando datos desde {from:yyyy-MM-dd} hasta {to:yyyy-MM-dd}");
 
-                // Totales (si no los usas, elimina estas líneas)
+                var data = await _svc.GetSalesAsync(from, to);
+                
+                Debug.WriteLine($"ReportsVM.LoadAsync: Servicio devolvió {data.Count} registros");
+                
+                foreach (var r in data) 
+                {
+                    Items.Add(r);
+                }
+
+                Debug.WriteLine($"ReportsVM.LoadAsync: Items.Count final = {Items.Count}");
+
+                // Totales
                 TotalTickets = Items.Count;
-                SumSubtotal = Items.Sum(x => (decimal)x.Subtotal);
-                SumTax = Items.Sum(x => (decimal)x.Tax);
-                SumTotal = Items.Sum(x => (decimal)x.Total);
+                SumSubtotal = Items.Sum(x => x.Subtotal);
+                SumTax = Items.Sum(x => x.Tax);
+                SumTotal = Items.Sum(x => x.Total);
+                
+                Debug.WriteLine($"ReportsVM.LoadAsync: Totales - Tickets:{TotalTickets}, Total:{SumTotal:C}");
             }
             catch (SqlException ex) { Error = $"Error SQL ({ex.Number})."; }
             catch (Exception ex) { Error = ex.Message; }

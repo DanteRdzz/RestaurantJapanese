@@ -26,7 +26,8 @@
 
             <Button Content="Cargar" Margin="12,0,0,0" Command="{Binding LoadCommand}"/>
             <Button Content="Hoy" Margin="8,0,0,0" Command="{Binding QuickTodayCommand}"/>
-            <Button Content="Últimos 30" Margin="8,0,0,0" Command="{Binding QuickLast30Command}"/>
+            <Button Content="Todos" Margin="8,0,0,0" Command="{Binding QuickAllCommand}" 
+                    ToolTipService.ToolTip="Mostrar todos los registros"/>
         </StackPanel>
 
         <!-- Encabezado de columnas -->
