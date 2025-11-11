@@ -62,6 +62,8 @@ namespace RestaurantJapanese.ViewModels
             get => _tip;
             set
             {
+                // Debug: Add console output to verify the setter is being called
+                System.Diagnostics.Debug.WriteLine($"[PosVM] Setting Tip from {_tip} to {value}");
                 Set(ref _tip, value);
                 Recalc();
             }
@@ -149,6 +151,9 @@ namespace RestaurantJapanese.ViewModels
             Tax = System.Math.Round(Subtotal * TaxRate, 2);
             Total = Subtotal + Tax + Tip;
 
+            // Debug: Add console output to verify calculations
+            System.Diagnostics.Debug.WriteLine($"[PosVM] Recalc - Subtotal: {Subtotal}, Tax: {Tax}, Tip: {Tip}, Total: {Total}");
+
             OnPropertyChanged(nameof(Subtotal));
             OnPropertyChanged(nameof(Tax));
             OnPropertyChanged(nameof(Total));
@@ -164,9 +169,14 @@ namespace RestaurantJapanese.ViewModels
             try
             {
                 var items = Cart.Select(c => (c.IdMenuItem, c.Qty));
+                
+                // Debug: Log the values being sent to CreateTicketAsync
+                System.Diagnostics.Debug.WriteLine($"[PosVM] CheckoutAsync - CreatedBy: {CurrentUserId}, Tip: {Tip}, TaxRate: {TaxRate}");
+                
                 var ticket = await _pos.CreateTicketAsync(CurrentUserId, Tip, TaxRate, items);
 
                 Cart.Clear();
+                Tip = 0m; // Reset tip after successful checkout
                 Recalc();
 
                 var msg =

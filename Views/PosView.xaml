@@ -284,15 +284,7 @@
                                                Foreground="{StaticResource JpTextBrush}"/>
                                 </StackPanel>
 
-                                <StackPanel>
-                                    <TextBlock Text="Propina" Foreground="{StaticResource JpMutedBrush}" FontSize="12"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Text="$" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
-                                        <NumberBox Width="90" Minimum="0"
-                                                   Value="{Binding Tip, Mode=TwoWay}"
-                                                   CornerRadius="{StaticResource JpRadiusS}"/>
-                                    </StackPanel>
-                                </StackPanel>
+                                
 
                                 <StackPanel>
                                     <TextBlock Text="TOTAL" Foreground="{StaticResource JpCrimsonBrush}" FontSize="12" FontWeight="SemiBold"/>

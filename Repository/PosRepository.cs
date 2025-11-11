@@ -55,6 +55,7 @@ namespace RestaurantJapanese.Repository
             var p = new DynamicParameters();
             p.Add("IdTicket", idTicket);
 
+            // Fixed: Should use sp_Pos_GetTicket, not sp_Pos_CreateTicket
             using var multi = await cn.QueryMultipleAsync("dbo.sp_Pos_GetTicket", p,
                 commandType: CommandType.StoredProcedure);
 
