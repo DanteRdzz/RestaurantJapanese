@@ -50,11 +50,9 @@ namespace RestaurantJapanese.ViewModels
                 init: (vm, w) =>
                 {
                     vm.OwnWindow = w;
-                    _ = vm.LoadAsync();
                 });
             win.Activate();
         });
-
 
 
         // ===== Placeholders (productos, etc.) =====

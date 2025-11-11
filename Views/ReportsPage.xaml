@@ -7,31 +7,46 @@
     <Grid Padding="12" RowSpacing="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- filtros -->
+            <RowDefinition Height="Auto"/>
+            <!-- header -->
             <RowDefinition Height="*"/>
+            <!-- lista -->
+            <RowDefinition Height="Auto"/>
+            <!-- totales -->
         </Grid.RowDefinitions>
 
-        <!-- Filtros y acciones -->
+        <!-- Filtros -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
             <TextBlock Text="Desde:" VerticalAlignment="Center"/>
-            <DatePicker Width="200"
-                        Date="{Binding FromDateOffset, Mode=TwoWay}"/>
+            <DatePicker Width="200" Date="{Binding FromDateOffset, Mode=TwoWay}"/>
 
             <TextBlock Text="Hasta:" Margin="12,0,0,0" VerticalAlignment="Center"/>
-            <DatePicker Width="200"
-                        Date="{Binding ToDateOffset, Mode=TwoWay}"/>
+            <DatePicker Width="200" Date="{Binding ToDateOffset, Mode=TwoWay}"/>
 
-            <Button Content="Cargar" Margin="12,0,0,0"
-                    Command="{Binding LoadCommand}"/>
-
-            <Button Content="Hoy" Margin="8,0,0,0"
-                    Command="{Binding QuickTodayCommand}"/>
-
-            <Button Content="Últimos 30" Margin="8,0,0,0"
-                    Command="{Binding QuickLast30Command}"/>
+            <Button Content="Cargar" Margin="12,0,0,0" Command="{Binding LoadCommand}"/>
+            <Button Content="Hoy" Margin="8,0,0,0" Command="{Binding QuickTodayCommand}"/>
+            <Button Content="Últimos 30" Margin="8,0,0,0" Command="{Binding QuickLast30Command}"/>
         </StackPanel>
 
-        <!-- Lista de resultados -->
-        <ListView Grid.Row="1" ItemsSource="{Binding Items}">
+        <!-- Encabezado de columnas -->
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="IdTicket" FontWeight="SemiBold"/>
+            <TextBlock Grid.Column="1" Text="Fecha/Hora" FontWeight="SemiBold"/>
+            <TextBlock Grid.Column="2" Text="Subtotal" FontWeight="SemiBold"/>
+            <TextBlock Grid.Column="3" Text="Impuesto" FontWeight="SemiBold"/>
+            <TextBlock Grid.Column="4" Text="Total" FontWeight="SemiBold"/>
+        </Grid>
+
+        <!-- Lista -->
+        <ListView Grid.Row="2" ItemsSource="{Binding Items}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:SalesReportRowModel">
                     <Grid ColumnSpacing="12">
@@ -52,5 +67,25 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!-- Totales -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Tickets:"/>
+                <TextBlock Text="{Binding TotalTickets}" FontWeight="SemiBold"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Subtotal:"/>
+                <TextBlock Text="{Binding SumSubtotal}" FontWeight="SemiBold"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Impuesto:"/>
+                <TextBlock Text="{Binding SumTax}" FontWeight="SemiBold"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="TOTAL:"/>
+                <TextBlock Text="{Binding SumTotal}" FontWeight="Bold"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>
