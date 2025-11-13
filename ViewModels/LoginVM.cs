@@ -62,6 +62,7 @@ namespace RestaurantJapanese.ViewModels
                 { Error = "Credenciales inválidas."; return; }
 
                 var role = (user.Role ?? "").Trim().ToLowerInvariant();
+                var displayName = user.DisplayName ?? user.UserName ?? "Usuario";
 
                 if (role == "admin")
                 {
@@ -70,7 +71,12 @@ namespace RestaurantJapanese.ViewModels
                                                   RestaurantJapanese.ViewModels.AdminMenuVM>(OwnWindow!);
 
                     if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.AdminMenuVM vmAdmin)
+                    {
                         vmAdmin.OwnWindow = OwnWindow;
+                        vmAdmin.CurrentUserId = user.IdUser;
+                        vmAdmin.CurrentUserName = displayName;
+                        vmAdmin.CurrentUserRole = user.Role ?? "Admin";
+                    }
                 }
                 else if (role == "empleado" || role == "cajero")
                 {
@@ -82,6 +88,7 @@ namespace RestaurantJapanese.ViewModels
                     {
                         vmPos.OwnWindow = OwnWindow;
                         vmPos.CurrentUserId = user.IdUser; // dispara LoadMenuAsync dentro del setter
+                        vmPos.CurrentUserName = displayName;
                     }
                 }
                 else
@@ -94,6 +101,7 @@ namespace RestaurantJapanese.ViewModels
                     {
                         vmPos.OwnWindow = OwnWindow;
                         vmPos.CurrentUserId = user.IdUser;
+                        vmPos.CurrentUserName = displayName;
                     }
                 }
             }

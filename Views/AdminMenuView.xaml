@@ -23,21 +23,53 @@
                        TextAlignment="Center"/>
         </StackPanel>
 
-        <!-- Breadcrumb -->
-        <Border Grid.Row="1"
-                Background="{StaticResource JpSurfaceBrush}"
-                CornerRadius="{StaticResource JpRadiusM}"
-                Padding="16,10"
-                Margin="0,0,0,12"
-                BorderBrush="{StaticResource JpGoldBrush}"
-                BorderThickness="1">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                <TextBlock Text="&#xE80F;" Style="{StaticResource JpIcon}" FontSize="18"/>
-                <TextBlock Text="Administrador" Foreground="{StaticResource JpTextBrush}" FontWeight="SemiBold"/>
-                <TextBlock Text="•" Foreground="{StaticResource JpMutedBrush}"/>
-                <TextBlock Text="Gestión del Sistema" Foreground="{StaticResource JpMutedBrush}"/>
-            </StackPanel>
-        </Border>
+        <!-- Información del usuario y breadcrumb -->
+        <StackPanel Grid.Row="1" Spacing="12" Margin="0,0,0,16">
+            <!-- Información del usuario logueado -->
+            <Border Background="{StaticResource JpSurfaceBrush}"
+                    CornerRadius="{StaticResource JpRadiusM}"
+                    Padding="16,12"
+                    BorderBrush="{StaticResource JpGoldBrush}"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="👤" FontSize="18" VerticalAlignment="Center"/>
+                        <TextBlock Text="Usuario:" Foreground="{StaticResource JpMutedBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentUserName}" 
+                                   Foreground="{StaticResource JpTextBrush}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <TextBlock Text="•" Foreground="{StaticResource JpMutedBrush}" VerticalAlignment="Center"/>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="🏷️" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Rol:" Foreground="{StaticResource JpMutedBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentUserRole}" 
+                                   Foreground="{StaticResource JpCrimsonBrush}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Breadcrumb -->
+            <Border Background="{StaticResource JpSurfaceBrush}"
+                    CornerRadius="{StaticResource JpRadiusM}"
+                    Padding="16,10"
+                    BorderBrush="{StaticResource JpLineBrush}"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="&#xE80F;" Style="{StaticResource JpIcon}" FontSize="18"/>
+                    <TextBlock Text="Panel de Control" Foreground="{StaticResource JpTextBrush}" FontWeight="SemiBold"/>
+                    <TextBlock Text="•" Foreground="{StaticResource JpMutedBrush}"/>
+                    <TextBlock Text="Gestión del Sistema" Foreground="{StaticResource JpMutedBrush}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
 
         <!-- Contenido desplazable -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">

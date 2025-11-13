@@ -19,6 +19,21 @@ namespace RestaurantJapanese.ViewModels
             set => Set(ref _currentUserId, value);
         }
 
+        // Información del usuario logueado
+        private string _currentUserName = "Administrador";
+        public string CurrentUserName
+        {
+            get => _currentUserName;
+            set => Set(ref _currentUserName, value);
+        }
+
+        private string _currentUserRole = "Admin";
+        public string CurrentUserRole
+        {
+            get => _currentUserRole;
+            set => Set(ref _currentUserRole, value);
+        }
+
         // ===== Empleados =====
         public ICommand OpenEmployeesCommand => new RelayCommand(_ =>
         {
@@ -37,6 +52,7 @@ namespace RestaurantJapanese.ViewModels
                 {
                     vm.OwnWindow = w;
                     vm.CurrentUserId = CurrentUserId > 0 ? CurrentUserId : 1;
+                    vm.CurrentUserName = CurrentUserName; // Pasar información del usuario
                     _ = vm.LoadMenuAsync();
                 });
             win.Activate();
