@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System;
 using RestaurantJapanese.Helpers;
 using RestaurantJapanese.Models;
 using RestaurantJapanese.Services.Interfaces;
@@ -15,6 +16,12 @@ namespace RestaurantJapanese.ViewModels
         public MenuInventarioAdminVM(IMenuService svc) => _svc = svc;
 
         public Window? OwnWindow { get; set; }
+
+        // Add XamlRoot property to be set by the view
+        public XamlRoot? ViewXamlRoot { get; set; }
+
+        // Event to notify view when operation finished (success flag, message)
+        public event Action<bool, string?>? OperationCompleted;
 
         public ObservableCollection<MenuItemModel> Items { get; } = new();
 
@@ -224,15 +231,13 @@ namespace RestaurantJapanese.ViewModels
         }
 
         /// <summary>
-        /// Busca un producto por ID específico (pestaña Buscar)
+        /// Busca productos por término (pestaña Buscar)
         /// </summary>
         private async Task SearchAsync()
         {
-            if (string.IsNullOrWhiteSpace(Search) || !int.TryParse(Search, out var id) || id <= 0)
+            if (string.IsNullOrWhiteSpace(Search)) 
             {
-                Error = "Ingresa un ID válido para buscar el producto.";
-                Items.Clear();
-                Selected = null;
+                Error = "Ingresa un término de búsqueda.";
                 return;
             }
             
@@ -240,40 +245,24 @@ namespace RestaurantJapanese.ViewModels
             try
             {
                 Items.Clear();
-                Selected = null;
-                
-                var found = await _svc.GetByIdAsync(id);
-                
-                if (found != null)
+                var list = await _svc.GetAllAsync(OnlyActive, Search!.Trim());
+                foreach (var item in list) 
                 {
-                    // Aplicar filtro OnlyActive si está activado
-                    if (!OnlyActive || found.IsActive)
-                    {
-                        Items.Add(found);
-                        Selected = found;
-                        Error = null;
-                    }
-                    else
-                    {
-                        Error = $"El producto con ID {id} existe pero está inactivo. Desactiva 'Solo activos' para verlo.";
-                    }
+                    Items.Add(item);
                 }
-                else
+                
+                if (!Items.Any())
                 {
-                    Error = $"No se encontró ningún producto con ID {id}.";
+                    Error = $"No se encontraron productos que coincidan con '{Search}'.";
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                Error = $"Error SQL al buscar producto ({ex.Number}): {ex.Message}";
-                Items.Clear();
-                Selected = null;
+                Error = $"Error SQL al buscar productos ({ex.Number}): {ex.Message}";
             }
             catch (System.Exception ex)
             {
-                Error = $"Error al buscar producto: {ex.Message}";
-                Items.Clear();
-                Selected = null;
+                Error = $"Error al buscar productos: {ex.Message}";
             }
         }
 
@@ -322,8 +311,8 @@ namespace RestaurantJapanese.ViewModels
                     ClearForm();
                     Error = null;
                     
-                    // Mostrar mensaje de éxito
-                    await ShowSuccessMessage("Producto creado exitosamente");
+                    // Mostrar mensaje de éxito usando el evento
+                    OperationCompleted?.Invoke(true, $"🍣 Producto '{created.Name}' creado exitosamente!\n\nID: {created.IdMenuItem}\nPrecio: {created.Price:C}");
                 }
                 else
                 {
@@ -391,8 +380,15 @@ namespace RestaurantJapanese.ViewModels
                     Selected = updated;
                     Error = null;
                     
-                    // Mostrar mensaje de éxito
-                    await ShowSuccessMessage($"Producto '{updated.Name}' (ID: {updated.IdMenuItem}) actualizado exitosamente");
+                    // Mostrar mensaje de éxito usando el evento con más detalles
+                    var statusText = updated.IsActive ? "Activo ✅" : "Inactivo ❌";
+                    OperationCompleted?.Invoke(true, 
+                        $"🎉 ¡Producto editado correctamente!\n\n" +
+                        $"📝 Nombre: {updated.Name}\n" +
+                        $"🆔 ID: {updated.IdMenuItem}\n" +
+                        $"💰 Precio: {updated.Price:C}\n" +
+                        $"📊 Estado: {statusText}\n\n" +
+                        $"✨ Todos los cambios se guardaron exitosamente");
                 }
                 else
                 {
@@ -402,15 +398,17 @@ namespace RestaurantJapanese.ViewModels
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
                 Error = $"Error SQL al actualizar producto ({ex.Number}): {ex.Message}";
+                OperationCompleted?.Invoke(false, $"Error de base de datos:\n{ex.Message}");
             }
             catch (System.Exception ex)
             {
                 Error = $"Error al actualizar producto: {ex.Message}";
+                OperationCompleted?.Invoke(false, $"Error inesperado:\n{ex.Message}");
             }
         }
 
         /// <summary>
-        /// Da de baja un producto (pestaña Dar de baja)
+        /// Da de baja un producto usando el ID ingresado (pestaña Dar de baja)
         /// </summary>
         private async Task SoftDeleteAsync()
         {
@@ -437,8 +435,14 @@ namespace RestaurantJapanese.ViewModels
                     Selected = updated;
                     Error = null;
                     
-                    // Mostrar mensaje de éxito
-                    await ShowSuccessMessage($"Producto '{updated.Name}' (ID: {updated.IdMenuItem}) dado de baja exitosamente.");
+                    // Mostrar mensaje de éxito usando el evento
+                    OperationCompleted?.Invoke(true, 
+                        $"🗑️ ¡Producto dado de baja exitosamente!\n\n" +
+                        $"📝 Producto: {updated.Name}\n" +
+                        $"🆔 ID: {updated.IdMenuItem}\n" +
+                        $"💰 Precio: {updated.Price:C}\n" +
+                        $"📊 Estado: Inactivo ❌\n\n" +
+                        $"ℹ️ El producto ya no aparecerá en las ventas");
                     
                     // Limpiar el campo de búsqueda
                     IdLookup = "";
@@ -447,17 +451,20 @@ namespace RestaurantJapanese.ViewModels
                 {
                     Error = $"No se pudo dar de baja el producto con ID {id}. Verifica que el ID sea correcto.";
                     Selected = null;
+                    OperationCompleted?.Invoke(false, $"No se encontró el producto con ID {id} o ya está dado de baja.");
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
                 Error = $"Error SQL al dar de baja producto ({ex.Number}): {ex.Message}";
                 Selected = null;
+                OperationCompleted?.Invoke(false, $"Error de base de datos:\n{ex.Message}");
             }
             catch (System.Exception ex)
             {
                 Error = $"Error al dar de baja producto: {ex.Message}";
                 Selected = null;
+                OperationCompleted?.Invoke(false, $"Error inesperado:\n{ex.Message}");
             }
         }
 
@@ -543,25 +550,6 @@ namespace RestaurantJapanese.ViewModels
             OnPropertyChanged(nameof(CreateVisibility));
             OnPropertyChanged(nameof(UpdateVisibility));
             OnPropertyChanged(nameof(DeleteVisibility));
-        }
-
-        /// <summary>
-        /// Muestra un mensaje de éxito
-        /// </summary>
-        private async Task ShowSuccessMessage(string message)
-        {
-            var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
-            if (root != null)
-            {
-                var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
-                {
-                    Title = "✅ Operación Exitosa",
-                    Content = message,
-                    CloseButtonText = "OK",
-                    XamlRoot = root
-                };
-                _ = dialog.ShowAsync();
-            }
         }
     }
 }
