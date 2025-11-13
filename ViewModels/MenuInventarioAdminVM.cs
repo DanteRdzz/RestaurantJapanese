@@ -38,6 +38,7 @@ namespace RestaurantJapanese.ViewModels
             {
                 Set(ref _isListSelected, value);
                 if (value) _ = LoadAsync();
+                UpdateVisibilities();
             }
         }
 
@@ -45,7 +46,11 @@ namespace RestaurantJapanese.ViewModels
         public bool IsSearchSelected
         {
             get => _isSearchSelected;
-            set => Set(ref _isSearchSelected, value);
+            set
+            {
+                Set(ref _isSearchSelected, value);
+                UpdateVisibilities();
+            }
         }
 
         private bool _isCreateSelected;
@@ -56,6 +61,7 @@ namespace RestaurantJapanese.ViewModels
             {
                 Set(ref _isCreateSelected, value);
                 if (value) ClearForm();
+                UpdateVisibilities();
             }
         }
 
@@ -66,7 +72,12 @@ namespace RestaurantJapanese.ViewModels
             set
             {
                 Set(ref _isUpdateSelected, value);
-                if (value && Selected != null) LoadToForm(Selected);
+                if (value) 
+                {
+                    // Cargar productos cuando se activa la pestaña de editar
+                    _ = LoadForEditAsync();
+                }
+                UpdateVisibilities();
             }
         }
 
@@ -74,7 +85,11 @@ namespace RestaurantJapanese.ViewModels
         public bool IsDeleteSelected
         {
             get => _isDeleteSelected;
-            set => Set(ref _isDeleteSelected, value);
+            set
+            {
+                Set(ref _isDeleteSelected, value);
+                UpdateVisibilities();
+            }
         }
 
         // Visibilidades para las secciones
@@ -84,7 +99,7 @@ namespace RestaurantJapanese.ViewModels
         public Visibility UpdateVisibility => IsUpdateSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility DeleteVisibility => IsDeleteSelected ? Visibility.Visible : Visibility.Collapsed;
 
-        // filtros
+        // Filtros
         private bool _onlyActive = true;
         public bool OnlyActive { get => _onlyActive; set => Set(ref _onlyActive, value); }
 
@@ -95,7 +110,7 @@ namespace RestaurantJapanese.ViewModels
         private string? _idLookup;
         public string? IdLookup { get => _idLookup; set => Set(ref _idLookup, value); }
 
-        // formulario - converted to proper properties with backing fields
+        // Formulario - propiedades con backing fields
         private int _idMenuItem;
         public int IdMenuItem 
         { 
@@ -160,8 +175,13 @@ namespace RestaurantJapanese.ViewModels
         public ICommand SoftDeleteCommand => new RelayCommand(async _ => await SoftDeleteAsync());
         public ICommand LoadByIdCommand => new RelayCommand(async _ => await LoadByIdAsync());
         public ICommand ClearCreateCommand => new RelayCommand(_ => ClearForm());
+        public ICommand NewCommand => new RelayCommand(_ => { ClearForm(); IsUpdateSelected = false; IsCreateSelected = true; });
 
         // ===== Métodos =====
+        
+        /// <summary>
+        /// Carga todos los productos (pestaña Listar)
+        /// </summary>
         public async Task LoadAsync()
         {
             Error = null;
@@ -169,37 +189,91 @@ namespace RestaurantJapanese.ViewModels
             {
                 Items.Clear();
                 var list = await _svc.GetAllAsync(OnlyActive, string.IsNullOrWhiteSpace(Search) ? null : Search!.Trim());
-                foreach (var it in list) Items.Add(it);
+                foreach (var item in list) 
+                {
+                    Items.Add(item);
+                }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                Error = $"Error SQL al cargar datos ({ex.Number}): {ex.Message}";
+                Error = $"Error SQL al cargar productos ({ex.Number}): {ex.Message}";
             }
             catch (System.Exception ex)
             {
-                Error = $"Error al cargar datos: {ex.Message}";
+                Error = $"Error al cargar productos: {ex.Message}";
             }
         }
 
+        /// <summary>
+        /// Busca un producto por ID específico (pestaña Buscar)
+        /// </summary>
         private async Task SearchAsync()
         {
-            if (string.IsNullOrWhiteSpace(Search)) 
+            if (string.IsNullOrWhiteSpace(Search) || !int.TryParse(Search, out var id) || id <= 0)
             {
-                Error = "Ingresa un término de búsqueda.";
+                Error = "Ingresa un ID válido para buscar el producto.";
                 return;
             }
-            await LoadAsync();
+            
+            Error = null;
+            try
+            {
+                Items.Clear();
+                var found = await _svc.GetByIdAsync(id);
+                
+                if (found != null)
+                {
+                    // Solo agregar el producto encontrado si cumple con el filtro OnlyActive
+                    if (!OnlyActive || found.IsActive)
+                    {
+                        Items.Add(found);
+                        Selected = found;
+                        Error = null;
+                    }
+                    else
+                    {
+                        Error = $"El producto con ID {id} existe pero está inactivo. Desactiva 'Solo activos' para verlo.";
+                    }
+                }
+                else
+                {
+                    Error = $"No se encontró ningún producto con ID {id}.";
+                    Selected = null;
+                }
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex)
+            {
+                Error = $"Error SQL al buscar producto ({ex.Number}): {ex.Message}";
+            }
+            catch (System.Exception ex)
+            {
+                Error = $"Error al buscar producto: {ex.Message}";
+            }
         }
 
+        /// <summary>
+        /// Crea un nuevo producto (pestaña Crear)
+        /// </summary>
         private async Task CreateAsync()
         {
             Error = null;
-            if (string.IsNullOrWhiteSpace(Name)) { Error = "Nombre es requerido."; return; }
-            if (Price < 0) { Error = "Precio inválido."; return; }
+            
+            // Validaciones
+            if (string.IsNullOrWhiteSpace(Name)) 
+            { 
+                Error = "El nombre del producto es requerido."; 
+                return; 
+            }
+            
+            if (Price < 0) 
+            { 
+                Error = "El precio debe ser mayor o igual a cero."; 
+                return; 
+            }
 
             try
             {
-                var dto = new MenuItemModel
+                var newItem = new MenuItemModel
                 {
                     IdMenuItem = 0, // Nuevo producto
                     Name = Name.Trim(),
@@ -208,43 +282,67 @@ namespace RestaurantJapanese.ViewModels
                     IsActive = IsActive
                 };
 
-                var created = await _svc.CreateAsync(dto);
+                var created = await _svc.CreateAsync(newItem);
                 if (created != null)
                 {
-                    Items.Add(created);
+                    // Agregar a la lista si estamos en modo "solo activos" y el nuevo item está activo
+                    // o si no estamos en modo "solo activos"
+                    if (!OnlyActive || created.IsActive)
+                    {
+                        Items.Add(created);
+                    }
+                    
                     Selected = created;
                     ClearForm();
                     Error = null;
                     
-                    // Cambiar a la sección de lista para ver el nuevo elemento
-                    IsListSelected = true;
-                    UpdateVisibilities();
+                    // Mostrar mensaje de éxito
+                    await ShowSuccessMessage("Producto creado exitosamente");
                 }
                 else
                 {
-                    Error = "No se pudo crear el elemento del menú.";
+                    Error = "No se pudo crear el producto. Intenta nuevamente.";
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                Error = $"Error SQL ({ex.Number}): {ex.Message}";
+                Error = $"Error SQL al crear producto ({ex.Number}): {ex.Message}";
             }
             catch (System.Exception ex)
             {
-                Error = $"Error: {ex.Message}";
+                Error = $"Error al crear producto: {ex.Message}";
             }
         }
 
+        /// <summary>
+        /// Guarda cambios en un producto existente (pestaña Editar)
+        /// </summary>
         private async Task SaveAsync()
         {
             Error = null;
-            if (IdMenuItem <= 0) { Error = "Selecciona un producto para editar."; return; }
-            if (string.IsNullOrWhiteSpace(Name)) { Error = "Nombre es requerido."; return; }
-            if (Price < 0) { Error = "Precio inválido."; return; }
+            
+            // Validaciones
+            if (IdMenuItem <= 0) 
+            { 
+                Error = "Selecciona un producto para editar."; 
+                return; 
+            }
+            
+            if (string.IsNullOrWhiteSpace(Name)) 
+            { 
+                Error = "El nombre del producto es requerido."; 
+                return; 
+            }
+            
+            if (Price < 0) 
+            { 
+                Error = "El precio debe ser mayor o igual a cero."; 
+                return; 
+            }
 
             try
             {
-                var dto = new MenuItemModel
+                var updatedItem = new MenuItemModel
                 {
                     IdMenuItem = IdMenuItem,
                     Name = Name.Trim(),
@@ -253,85 +351,105 @@ namespace RestaurantJapanese.ViewModels
                     IsActive = IsActive
                 };
 
-                var updated = await _svc.UpdateAsync(dto);
+                var updated = await _svc.UpdateAsync(updatedItem);
                 if (updated != null)
                 {
-                    var row = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
-                    if (row != null)
+                    // Actualizar en la lista
+                    var existingItem = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
+                    if (existingItem != null)
                     {
-                        var idx = Items.IndexOf(row);
-                        Items[idx] = updated;
+                        var index = Items.IndexOf(existingItem);
+                        Items[index] = updated;
                     }
+                    
                     Selected = updated;
                     Error = null;
+                    
+                    // Mostrar mensaje de éxito
+                    await ShowSuccessMessage("Producto actualizado exitosamente");
                 }
                 else
                 {
-                    Error = "No se pudo actualizar el elemento del menú.";
+                    Error = "No se pudo actualizar el producto. Intenta nuevamente.";
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                Error = $"Error SQL ({ex.Number}): {ex.Message}";
+                Error = $"Error SQL al actualizar producto ({ex.Number}): {ex.Message}";
             }
             catch (System.Exception ex)
             {
-                Error = $"Error: {ex.Message}";
+                Error = $"Error al actualizar producto: {ex.Message}";
             }
         }
 
+        /// <summary>
+        /// Da de baja un producto (pestaña Dar de baja)
+        /// </summary>
         private async Task SoftDeleteAsync()
         {
-            if (Selected == null || Selected.IdMenuItem <= 0) 
-            { 
-                Error = "Selecciona un producto para dar de baja."; 
-                return; 
+            if (string.IsNullOrWhiteSpace(IdLookup) || !int.TryParse(IdLookup, out var id) || id <= 0)
+            {
+                Error = "Ingresa un ID válido para dar de baja el producto.";
+                return;
             }
             
             Error = null;
             try
             {
-                var updated = await _svc.SoftDeleteAsync(Selected.IdMenuItem);
+                var updated = await _svc.SoftDeleteAsync(id);
                 if (updated != null)
                 {
-                    var row = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
-                    if (row != null)
+                    // Actualizar en la lista si el item existe ahí
+                    var existingItem = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
+                    if (existingItem != null)
                     {
-                        var idx = Items.IndexOf(row);
-                        Items[idx] = updated; // ahora IsActive=false
+                        var index = Items.IndexOf(existingItem);
+                        Items[index] = updated; // Ahora IsActive=false
                     }
+                    
                     Selected = updated;
                     Error = null;
+                    
+                    // Mostrar mensaje de éxito
+                    await ShowSuccessMessage($"Producto '{updated.Name}' (ID: {updated.IdMenuItem}) dado de baja exitosamente.");
+                    
+                    // Limpiar el campo de búsqueda
+                    IdLookup = "";
                 }
                 else
                 {
-                    Error = "No se pudo dar de baja el elemento del menú.";
+                    Error = $"No se pudo dar de baja el producto con ID {id}. Verifica que el ID sea correcto.";
+                    Selected = null;
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                Error = $"Error SQL al dar de baja ({ex.Number}): {ex.Message}";
+                Error = $"Error SQL al dar de baja producto ({ex.Number}): {ex.Message}";
+                Selected = null;
             }
             catch (System.Exception ex)
             {
-                Error = $"Error al dar de baja: {ex.Message}";
+                Error = $"Error al dar de baja producto: {ex.Message}";
+                Selected = null;
             }
         }
 
+        /// <summary>
+        /// Busca un producto por ID (pestaña Dar de baja)
+        /// </summary>
         private async Task LoadByIdAsync()
         {
             Error = null;
             if (string.IsNullOrWhiteSpace(IdLookup) || !int.TryParse(IdLookup, out var id) || id <= 0)
             {
-                Error = "Ingresa un ID válido.";
+                Error = "Ingresa un ID válido para buscar.";
                 return;
             }
 
             try
             {
-                var allItems = await _svc.GetAllAsync(false, null); // Incluir inactivos para búsqueda por ID
-                var found = allItems.FirstOrDefault(x => x.IdMenuItem == id);
-                
+                var found = await _svc.GetByIdAsync(id);
                 if (found != null)
                 {
                     Selected = found;
@@ -346,25 +464,36 @@ namespace RestaurantJapanese.ViewModels
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                Error = $"Error SQL al buscar ({ex.Number}): {ex.Message}";
+                Error = $"Error SQL al buscar producto ({ex.Number}): {ex.Message}";
             }
             catch (System.Exception ex)
             {
-                Error = $"Error al buscar: {ex.Message}";
+                Error = $"Error al buscar producto: {ex.Message}";
             }
         }
 
-        private void LoadToForm(MenuItemModel? m)
+        /// <summary>
+        /// Carga los datos de un producto en el formulario
+        /// </summary>
+        private void LoadToForm(MenuItemModel? item)
         {
-            if (m is null) { ClearForm(); return; }
-            IdMenuItem = m.IdMenuItem;
-            Name = m.Name;
-            Description = m.Description;
-            Price = m.Price;
-            IsActive = m.IsActive;
+            if (item == null) 
+            { 
+                ClearForm(); 
+                return; 
+            }
+            
+            IdMenuItem = item.IdMenuItem;
+            Name = item.Name;
+            Description = item.Description;
+            Price = item.Price;
+            IsActive = item.IsActive;
             OnPropertyChanged(nameof(PriceText));
         }
 
+        /// <summary>
+        /// Limpia el formulario
+        /// </summary>
         private void ClearForm()
         {
             IdMenuItem = 0;
@@ -376,6 +505,9 @@ namespace RestaurantJapanese.ViewModels
             OnPropertyChanged(nameof(PriceText));
         }
 
+        /// <summary>
+        /// Actualiza las visibilidades de las secciones
+        /// </summary>
         private void UpdateVisibilities()
         {
             OnPropertyChanged(nameof(ListVisibility));
@@ -383,6 +515,54 @@ namespace RestaurantJapanese.ViewModels
             OnPropertyChanged(nameof(CreateVisibility));
             OnPropertyChanged(nameof(UpdateVisibility));
             OnPropertyChanged(nameof(DeleteVisibility));
+        }
+
+        /// <summary>
+        /// Muestra un mensaje de éxito
+        /// </summary>
+        private async Task ShowSuccessMessage(string message)
+        {
+            var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
+            if (root != null)
+            {
+                var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+                {
+                    Title = "✅ Operación Exitosa",
+                    Content = message,
+                    CloseButtonText = "OK",
+                    XamlRoot = root
+                };
+                _ = dialog.ShowAsync();
+            }
+        }
+
+        /// <summary>
+        /// Carga productos para la sección de editar
+        /// </summary>
+        private async Task LoadForEditAsync()
+        {
+            Error = null;
+            try
+            {
+                // Solo cargar si la lista está vacía para evitar recargas innecesarias
+                if (!Items.Any())
+                {
+                    var list = await _svc.GetAllAsync(OnlyActive, null);
+                    Items.Clear();
+                    foreach (var item in list) 
+                    {
+                        Items.Add(item);
+                    }
+                }
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex)
+            {
+                Error = $"Error SQL al cargar productos para editar ({ex.Number}): {ex.Message}";
+            }
+            catch (System.Exception ex)
+            {
+                Error = $"Error al cargar productos para editar: {ex.Message}";
+            }
         }
     }
 }
