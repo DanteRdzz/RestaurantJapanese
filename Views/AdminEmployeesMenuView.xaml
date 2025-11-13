@@ -9,14 +9,17 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+        <!-- Título Principal de la Página -->
         <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-                <TextBlock Text="👥" FontSize="28" VerticalAlignment="Center"/>
-                <TextBlock Text="Gestión de Empleados" Style="{StaticResource JpTitle}"/>
-                <TextBlock Text="👥" FontSize="28" VerticalAlignment="Center"/>
+                <TextBlock Text="👥" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Gestión de Empleados" Style="{StaticResource JpPageTitle}"/>
+                <TextBlock Text="👥" FontSize="32" VerticalAlignment="Center"/>
             </StackPanel>
             <Rectangle Style="{StaticResource JpSeparator}" Width="420" HorizontalAlignment="Center"/>
+            <TextBlock Text="Administra tu equipo de trabajo con herramientas profesionales"
+                       Style="{StaticResource JpPageSubtitle}"
+                       TextAlignment="Center"/>
             
             <!-- Navigation tabs -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using WinRT.Interop;
 
 namespace RestaurantJapanese.Helpers
 {
@@ -18,6 +21,72 @@ namespace RestaurantJapanese.Helpers
                 throw new InvalidOperationException("NavigationHelper.Services no está inicializado.");
 
             return Services.GetRequiredService<T>();
+        }
+
+        /// <summary>
+        /// Obtiene el título de ventana apropiado basado en el tipo de vista
+        /// </summary>
+        private static string GetWindowTitle<TView>() where TView : FrameworkElement
+        {
+            var viewType = typeof(TView).Name;
+            
+            return viewType switch
+            {
+                "LoginView" => "🍜 Restaurant Japanese - Inicio de Sesión",
+                "AdminMenuView" => "🌸 Restaurant Japanese - Panel de Administración",
+                "AdminEmployeesMenuView" => "👥 Restaurant Japanese - Gestión de Empleados",
+                "PosView" => "💰 Restaurant Japanese - Punto de Venta",
+                "ReportsPage" => "📊 Restaurant Japanese - Reportes de Ventas",
+                "MenuInventarioAdminView" => "🍣 Restaurant Japanese - Inventario de Menú",
+                "HomeView" => "🏠 Restaurant Japanese - Inicio",
+                _ => "🍜 Restaurant Japanese"
+            };
+        }
+
+        /// <summary>
+        /// Configura una ventana para que se abra maximizada (excepto Login) y con título personalizado
+        /// </summary>
+        private static void ConfigureWindow<TView>(Window window) where TView : FrameworkElement
+        {
+            try
+            {
+                // Configurar título de ventana
+                var title = GetWindowTitle<TView>();
+                window.Title = title;
+
+                // No maximizar la ventana de login
+                var shouldMaximize = !typeof(TView).Name.Contains("Login");
+
+                if (shouldMaximize)
+                {
+                    // Configurar la ventana después de que se active
+                    window.Activated += (sender, args) =>
+                    {
+                        try
+                        {
+                            var hWnd = WindowNative.GetWindowHandle(window);
+                            var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
+                            var appWindow = AppWindow.GetFromWindowId(windowId);
+
+                            if (appWindow?.Presenter is OverlappedPresenter presenter)
+                            {
+                                presenter.Maximize();
+                                presenter.IsResizable = true;
+                                presenter.IsMaximizable = true;
+                                presenter.IsMinimizable = true;
+                            }
+                        }
+                        catch
+                        {
+                            // Ignorar errores de configuración
+                        }
+                    };
+                }
+            }
+            catch
+            {
+                // Si falla, no hacer nada - la ventana se abrirá con configuración normal
+            }
         }
 
         /// <summary>
@@ -38,6 +107,10 @@ namespace RestaurantJapanese.Helpers
             view.DataContext = vm;
 
             var win = new Window { Content = view };
+            
+            // Configurar ventana (título y maximización)
+            ConfigureWindow<TView>(win);
+            
             _openWindows.Add(win);
             win.Closed += (_, __) => _openWindows.Remove(win);
 
@@ -59,6 +132,10 @@ namespace RestaurantJapanese.Helpers
             view.DataContext = vm;
 
             var win = new Window { Content = view };
+            
+            // Configurar ventana (título y maximización)
+            ConfigureWindow<TView>(win);
+            
             _openWindows.Add(win);
             win.Closed += (_, __) => _openWindows.Remove(win);
 
@@ -87,6 +164,9 @@ namespace RestaurantJapanese.Helpers
             view.DataContext = vm;
 
             owner.Content = view;
+
+            // Configurar ventana (título y maximización si corresponde)
+            ConfigureWindow<TView>(owner);
 
             init?.Invoke(vm, owner);
 

@@ -10,16 +10,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Encabezado -->
+        <!-- Título Principal de la Página -->
         <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,16" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-                <TextBlock Text="🌸" FontSize="28" VerticalAlignment="Center"/>
-                <TextBlock Text="Panel de Administración" Style="{StaticResource JpTitle}"/>
-                <TextBlock Text="🌸" FontSize="28" VerticalAlignment="Center"/>
+                <TextBlock Text="🌸" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Panel de Administración" Style="{StaticResource JpPageTitle}"/>
+                <TextBlock Text="🌸" FontSize="32" VerticalAlignment="Center"/>
             </StackPanel>
-            <Rectangle Style="{StaticResource JpSeparator}" Width="200" HorizontalAlignment="Center"/>
+            <Rectangle Style="{StaticResource JpSeparator}" Width="250" HorizontalAlignment="Center"/>
             <TextBlock Text="Configura tu restaurante japonés con elegancia y tradición"
-                       Style="{StaticResource JpSubtitle}"
+                       Style="{StaticResource JpPageSubtitle}"
                        TextAlignment="Center"/>
         </StackPanel>
 
@@ -41,7 +41,7 @@
 
         <!-- Contenido desplazable -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <!-- Contenedor con ancho máximo para que no “estire” demasiado en pantallas grandes -->
+            <!-- Contenedor con ancho máximo para que no "estire" demasiado en pantallas grandes -->
             <Grid MaxWidth="1100" HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="320"/>
@@ -57,9 +57,10 @@
                 <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource JpAdminCard}" Margin="6">
                     <StackPanel Spacing="14">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="{StaticResource JpCrimsonBrush}" CornerRadius="24" Width="48" Height="48" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE716;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
+                            <Button Style="{StaticResource JpRoundButton}" 
+                                    Content="&#xE716;" 
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Command="{Binding OpenEmployeesCommand}"/>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="Gestión de Empleados" Style="{StaticResource JpCardTitle}"/>
                                 <TextBlock Text="Módulo activo"
@@ -84,9 +85,10 @@
                 <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource JpAdminCard}" Margin="6">
                     <StackPanel Spacing="14">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="{StaticResource JpAccentBrush}" CornerRadius="24" Width="48" Height="48" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE7BF;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
+                            <Button Style="{StaticResource JpRoundButtonOrange}" 
+                                    Content="&#xE7BF;" 
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Command="{Binding OpenPosCommand}"/>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="Punto de Venta" Style="{StaticResource JpCardTitle}"/>
                                 <TextBlock Text="Módulo activo"
@@ -111,61 +113,57 @@
                 <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource JpAdminCard}" Margin="6">
                     <StackPanel Spacing="14">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="{StaticResource JpAccentBrush}" CornerRadius="24" Width="48" Height="48" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE7C7;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="18"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
+                            <Button Style="{StaticResource JpRoundButtonOrange}" 
+                                    Content="&#xE7C7;" 
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Command="{Binding OpenInventoryCommand}"/>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="Gestión de Productos (Inventario)" Style="{StaticResource JpCardTitle}"/>
                                 <TextBlock Text="Módulo Activo" Foreground="{StaticResource JpBambooBrush}"
-                           FontSize="12" FontWeight="SemiBold"/>
+                                           FontSize="12" FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
 
                         <TextBlock Text="Administra el menú: platillos, precios y disponibilidad."
-                   Style="{StaticResource JpCardDescription}" TextWrapping="Wrap"/>
+                                   Style="{StaticResource JpCardDescription}" TextWrapping="Wrap"/>
 
                         <Rectangle Height="1" Fill="{StaticResource JpLineBrush}" Margin="0,4"/>
 
                         <Button Content="Abrir Inventario"
-                Style="{StaticResource JpPrimaryButton}"
-                HorizontalAlignment="Stretch"
-                Command="{Binding OpenInventoryCommand}"/>
+                                Style="{StaticResource JpPrimaryButton}"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding OpenInventoryCommand}"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Análisis y Reportes (ACTIVO) -->
-                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource JpAdminCard}">
-                    <StackPanel Spacing="20">
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource JpAdminCard}" Margin="6">
+                    <StackPanel Spacing="14">
                         <!-- Header con ícono -->
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <Border Background="{StaticResource JpMutedBrush}"
-                    CornerRadius="25"
-                    Width="50" Height="50">
-                                <TextBlock Text="&#xE9D2;"
-                           Style="{StaticResource JpIcon}"
-                           Foreground="White"
-                           FontSize="20"/>
-                            </Border>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Style="{StaticResource JpRoundButtonGreen}" 
+                                    Content="&#xE9D2;" 
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Command="{Binding OpenSalesReportCommand}"/>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="Análisis y Reportes"
-                           Style="{StaticResource JpCardTitle}"/>
+                                           Style="{StaticResource JpCardTitle}"/>
                                 <TextBlock Text="Ventas por día, semana y mes"
-                           Foreground="{StaticResource JpBambooBrush}"
-                           FontSize="12"
-                           FontWeight="SemiBold"/>
+                                           Foreground="{StaticResource JpBambooBrush}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
 
                         <TextBlock Text="Consulta gráficos y tablas de ventas. Filtra por día/semana/mes y exporta."
-                   Style="{StaticResource JpCardDescription}"/>
+                                   Style="{StaticResource JpCardDescription}"/>
 
-                        <Rectangle Height="1" Fill="{StaticResource JpLineBrush}" Margin="0,8"/>
+                        <Rectangle Height="1" Fill="{StaticResource JpLineBrush}" Margin="0,4"/>
 
                         <!-- BOTÓN ACTIVO -->
-                        <Button Style="{StaticResource JpPrimaryButton}"
-                Content="Abrir Reportes"
-                Command="{Binding OpenSalesReportCommand}"/>
+                        <Button Style="{StaticResource JpSecondaryButton}"
+                                Content="Abrir Reportes"
+                                Command="{Binding OpenSalesReportCommand}"/>
                     </StackPanel>
                 </Border>
             </Grid>

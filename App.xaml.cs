@@ -53,8 +53,7 @@ namespace RestaurantJapanese
                     services.AddTransient<AdminMenuView>();
                     services.AddTransient<AdminEmployeesMenuView>();
                     services.AddTransient<PosView>();
-                    services.AddTransient<ReportsPage>(); // <- Add this line
-
+                    services.AddTransient<ReportsPage>();
                     services.AddTransient<MenuInventarioAdminView>();
                 })
                 .Build();
@@ -65,7 +64,7 @@ namespace RestaurantJapanese
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            // Abrir la ventana de Login
+            // Abrir la ventana de Login (sin maximizar)
             var win = NavigationHelper.OpenWindow<LoginView, LoginVM>();
 
             // Guardar la referencia de la Window en el VM para poder cerrarla al navegar
