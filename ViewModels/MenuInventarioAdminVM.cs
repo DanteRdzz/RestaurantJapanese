@@ -74,8 +74,8 @@ namespace RestaurantJapanese.ViewModels
                 Set(ref _isUpdateSelected, value);
                 if (value) 
                 {
-                    // Cargar productos cuando se activa la pestaña de editar
-                    _ = LoadForEditAsync();
+                    // Solo limpiar el formulario cuando se activa la pestaña
+                    ClearForm();
                 }
                 UpdateVisibilities();
             }
@@ -116,6 +116,25 @@ namespace RestaurantJapanese.ViewModels
         { 
             get => _idMenuItem; 
             set => Set(ref _idMenuItem, value); 
+        }
+
+        // Propiedad para el binding del ID como texto
+        public string IdMenuItemText
+        {
+            get => _idMenuItem.ToString();
+            set
+            {
+                if (int.TryParse(value, out var result) && result >= 0)
+                {
+                    Set(ref _idMenuItem, result);
+                }
+                else if (string.IsNullOrWhiteSpace(value))
+                {
+                    Set(ref _idMenuItem, 0);
+                }
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IdMenuItem));
+            }
         }
 
         private string _name = "";
@@ -212,6 +231,8 @@ namespace RestaurantJapanese.ViewModels
             if (string.IsNullOrWhiteSpace(Search) || !int.TryParse(Search, out var id) || id <= 0)
             {
                 Error = "Ingresa un ID válido para buscar el producto.";
+                Items.Clear();
+                Selected = null;
                 return;
             }
             
@@ -219,11 +240,13 @@ namespace RestaurantJapanese.ViewModels
             try
             {
                 Items.Clear();
+                Selected = null;
+                
                 var found = await _svc.GetByIdAsync(id);
                 
                 if (found != null)
                 {
-                    // Solo agregar el producto encontrado si cumple con el filtro OnlyActive
+                    // Aplicar filtro OnlyActive si está activado
                     if (!OnlyActive || found.IsActive)
                     {
                         Items.Add(found);
@@ -238,16 +261,19 @@ namespace RestaurantJapanese.ViewModels
                 else
                 {
                     Error = $"No se encontró ningún producto con ID {id}.";
-                    Selected = null;
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
             {
                 Error = $"Error SQL al buscar producto ({ex.Number}): {ex.Message}";
+                Items.Clear();
+                Selected = null;
             }
             catch (System.Exception ex)
             {
                 Error = $"Error al buscar producto: {ex.Message}";
+                Items.Clear();
+                Selected = null;
             }
         }
 
@@ -324,7 +350,7 @@ namespace RestaurantJapanese.ViewModels
             // Validaciones
             if (IdMenuItem <= 0) 
             { 
-                Error = "Selecciona un producto para editar."; 
+                Error = "Ingresa un ID válido del producto para editar."; 
                 return; 
             }
             
@@ -354,7 +380,7 @@ namespace RestaurantJapanese.ViewModels
                 var updated = await _svc.UpdateAsync(updatedItem);
                 if (updated != null)
                 {
-                    // Actualizar en la lista
+                    // Actualizar en la lista si existe
                     var existingItem = Items.FirstOrDefault(x => x.IdMenuItem == updated.IdMenuItem);
                     if (existingItem != null)
                     {
@@ -366,11 +392,11 @@ namespace RestaurantJapanese.ViewModels
                     Error = null;
                     
                     // Mostrar mensaje de éxito
-                    await ShowSuccessMessage("Producto actualizado exitosamente");
+                    await ShowSuccessMessage($"Producto '{updated.Name}' (ID: {updated.IdMenuItem}) actualizado exitosamente");
                 }
                 else
                 {
-                    Error = "No se pudo actualizar el producto. Intenta nuevamente.";
+                    Error = "No se pudo actualizar el producto. Verifica que el ID exista.";
                 }
             }
             catch (Microsoft.Data.SqlClient.SqlException ex)
@@ -489,6 +515,7 @@ namespace RestaurantJapanese.ViewModels
             Price = item.Price;
             IsActive = item.IsActive;
             OnPropertyChanged(nameof(PriceText));
+            OnPropertyChanged(nameof(IdMenuItemText));
         }
 
         /// <summary>
@@ -503,6 +530,7 @@ namespace RestaurantJapanese.ViewModels
             IsActive = true;
             Error = null;
             OnPropertyChanged(nameof(PriceText));
+            OnPropertyChanged(nameof(IdMenuItemText));
         }
 
         /// <summary>
@@ -533,35 +561,6 @@ namespace RestaurantJapanese.ViewModels
                     XamlRoot = root
                 };
                 _ = dialog.ShowAsync();
-            }
-        }
-
-        /// <summary>
-        /// Carga productos para la sección de editar
-        /// </summary>
-        private async Task LoadForEditAsync()
-        {
-            Error = null;
-            try
-            {
-                // Solo cargar si la lista está vacía para evitar recargas innecesarias
-                if (!Items.Any())
-                {
-                    var list = await _svc.GetAllAsync(OnlyActive, null);
-                    Items.Clear();
-                    foreach (var item in list) 
-                    {
-                        Items.Add(item);
-                    }
-                }
-            }
-            catch (Microsoft.Data.SqlClient.SqlException ex)
-            {
-                Error = $"Error SQL al cargar productos para editar ({ex.Number}): {ex.Message}";
-            }
-            catch (System.Exception ex)
-            {
-                Error = $"Error al cargar productos para editar: {ex.Message}";
             }
         }
     }
