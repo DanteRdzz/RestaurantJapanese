@@ -19,58 +19,145 @@ namespace RestaurantJapanese.ViewModels
             set => Set(ref _currentUserId, value);
         }
 
+        // Información del usuario logueado
+        private string _currentUserName = "Administrador";
+        public string CurrentUserName
+        {
+            get => _currentUserName;
+            set => Set(ref _currentUserName, value);
+        }
+
+        private string _currentUserRole = "Admin";
+        public string CurrentUserRole
+        {
+            get => _currentUserRole;
+            set => Set(ref _currentUserRole, value);
+        }
+
         // ===== Empleados =====
         public ICommand OpenEmployeesCommand => new RelayCommand(_ =>
         {
+<<<<<<< HEAD
+            // Siempre abrir nueva ventana para empleados
+            var win = NavigationHelper.OpenWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
+                parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
+            win.Activate();
+=======
+            System.Diagnostics.Debug.WriteLine("Abriendo módulo de empleados");
+
             if (OwnWindow is not null)
             {
                 NavigationHelper.ReplaceWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
-                    OwnWindow, parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
+                    OwnWindow, init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        System.Diagnostics.Debug.WriteLine("EmployeesMenu cargado en ventana existente");
+                    });
             }
             else
             {
-                var win = NavigationHelper.OpenWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>(
-                    parameter: null, init: (vm, w) => { vm.OwnWindow = w; });
+                var win = NavigationHelper.OpenWindow<Views.AdminEmployeesMenuView, AdminEmployeesMenuVM>();
+                if ((win.Content as FrameworkElement)?.DataContext is AdminEmployeesMenuVM vm)
+                    vm.OwnWindow = win;
                 win.Activate();
+                System.Diagnostics.Debug.WriteLine("EmployeesMenu cargado en nueva ventana");
             }
+>>>>>>> adding return buttons
         });
 
         // ===== POS =====
         public ICommand OpenPosCommand => new RelayCommand(_ =>
         {
-            var win = NavigationHelper.OpenWindow<Views.PosView, PosVM>(
-                parameter: null,
-                init: (vm, w) =>
+            System.Diagnostics.Debug.WriteLine("Abriendo POS");
+
+            if (OwnWindow is not null)
+            {
+                NavigationHelper.ReplaceWindow<Views.PosView, PosVM>(
+                    OwnWindow, init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        vm.CurrentUserId = CurrentUserId > 0 ? CurrentUserId : 1;
+                        _ = vm.LoadMenuAsync();
+                        System.Diagnostics.Debug.WriteLine($"POS cargado en ventana existente con userId: {vm.CurrentUserId}");
+                    });
+            }
+            else
+            {
+                var win = NavigationHelper.OpenWindow<Views.PosView, PosVM>();
+                if ((win.Content as FrameworkElement)?.DataContext is PosVM vm)
                 {
-                    vm.OwnWindow = w;
+                    vm.OwnWindow = win;
                     vm.CurrentUserId = CurrentUserId > 0 ? CurrentUserId : 1;
+                    vm.CurrentUserName = CurrentUserName; // Pasar información del usuario
                     _ = vm.LoadMenuAsync();
-                });
-            win.Activate();
+                }
+                win.Activate();
+                System.Diagnostics.Debug.WriteLine("POS cargado en nueva ventana");
+            }
         });
 
         // ===== Reportes =====
         public ICommand OpenSalesReportCommand => new RelayCommand(_ =>
         {
+<<<<<<< HEAD
+            var win = NavigationHelper.OpenWindow<Views.ReportsPage, ReportsVM>(
+                parameter: null,
+                init: (vm, w) =>
+                {
+                    vm.OwnWindow = w;
+                });
+            win.Activate();
+        });
+
+
+        // ===== Placeholders (productos, etc.) =====
+=======
+            System.Diagnostics.Debug.WriteLine("Abriendo reportes");
+
             if (OwnWindow is not null)
             {
                 NavigationHelper.ReplaceWindow<Views.ReportsView, ReportsVM>(
-                    OwnWindow, parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
+                    OwnWindow, init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        _ = vm.LoadAsync();
+                        System.Diagnostics.Debug.WriteLine("Reportes cargado en ventana existente");
+                    });
             }
             else
             {
-                var win = NavigationHelper.OpenWindow<Views.ReportsView, ReportsVM>(
-                    parameter: null, init: (vm, w) => { vm.OwnWindow = w; _ = vm.LoadAsync(); });
+                var win = NavigationHelper.OpenWindow<Views.ReportsView, ReportsVM>();
+                if ((win.Content as FrameworkElement)?.DataContext is ReportsVM vm)
+                {
+                    vm.OwnWindow = win;
+                    _ = vm.LoadAsync();
+                }
                 win.Activate();
+                System.Diagnostics.Debug.WriteLine("Reportes cargado en nueva ventana");
             }
         });
 
-        // ===== Placeholders (productos, etc.) =====
+        // ===== Inventario =====
+>>>>>>> adding return buttons
         public ICommand OpenInventoryCommand => new RelayCommand(_ =>
         {
-            var win = NavigationHelper.OpenWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>();
-            win.Activate();
+            System.Diagnostics.Debug.WriteLine("Abriendo inventario");
+
+            if (OwnWindow is not null)
+            {
+                NavigationHelper.ReplaceWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>(
+                    OwnWindow, init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        System.Diagnostics.Debug.WriteLine("Inventario cargado en ventana existente");
+                    });
+            }
+            else
+            {
+                var win = NavigationHelper.OpenWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>();
+                if ((win.Content as FrameworkElement)?.DataContext is MenuInventarioAdminVM vm)
+                    vm.OwnWindow = win;
+                win.Activate();
+                System.Diagnostics.Debug.WriteLine("Inventario cargado en nueva ventana");
+            }
         });
+
         private async Task PendingAsync(string module)
         {
             var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;

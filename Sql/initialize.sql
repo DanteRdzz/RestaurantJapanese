@@ -431,6 +431,17 @@ BEGIN
   EXEC dbo.sp_Menu_GetById @IdMenuItem;
 END
 GO
+GO
+ALTER PROCEDURE dbo.sp_RestJP_Sales_Report
+	@FechaInicio		DATETIME,
+	@FechaFin			DATETIME
+AS
+BEGIN
+	SELECT IdTicket, CreatedAt, Subtotal, Tax, Total
+	FROM Tickets
+	WHERE CreatedAt BETWEEN @FechaInicio AND @FechaFin
+END;
+GO
 
 /*5. Datos iniciales (seed idempotente) */
 PRINT 'Seed de MenuItems...';

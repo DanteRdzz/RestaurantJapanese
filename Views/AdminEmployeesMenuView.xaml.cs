@@ -33,7 +33,8 @@ namespace RestaurantJapanese.Views
             if (this.DataContext is AdminEmployeesMenuVM vm)
             {
                 vm.CreateCompleted += Vm_CreateCompleted;
-                vm.OwnWindow = (Window?)Window.Current; // best effort; NavigationHelper usually sets it
+                // Pass the UserControl's XamlRoot instead of Window.Current
+                vm.ViewXamlRoot = this.XamlRoot;
             }
         }
 

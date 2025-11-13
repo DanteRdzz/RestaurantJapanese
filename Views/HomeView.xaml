@@ -5,13 +5,27 @@
     
     <Grid Background="{StaticResource JpGradientBg}" Padding="40">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Título Principal de la Página -->
+        <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,20" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                <TextBlock Text="??" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Bienvenido al Restaurant Japonés" Style="{StaticResource JpPageTitle}"/>
+                <TextBlock Text="??" FontSize="32" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Rectangle Style="{StaticResource JpSeparator}" Width="400" HorizontalAlignment="Center"/>
+            <TextBlock Text="Sistema de gestión integral con la elegancia de la tradición japonesa"
+                       Style="{StaticResource JpPageSubtitle}"
+                       TextAlignment="Center"/>
+        </StackPanel>
+
         <!-- Encabezado Japonés Tradicional -->
-        <StackPanel Grid.Row="0" 
+        <StackPanel Grid.Row="1" 
                     VerticalAlignment="Center" 
                     HorizontalAlignment="Center" 
                     Spacing="24">
@@ -27,7 +41,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
                         <TextBlock Text="??" FontSize="40" VerticalAlignment="Center"/>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="????????" 
+                            <TextBlock Text="?????" 
                                        FontSize="24" 
                                        FontWeight="Light"
                                        HorizontalAlignment="Center"
@@ -55,7 +69,7 @@
         </StackPanel>
 
         <!-- Contenido Central -->
-        <StackPanel Grid.Row="1" 
+        <StackPanel Grid.Row="2" 
                     VerticalAlignment="Center" 
                     HorizontalAlignment="Center" 
                     Spacing="32" 
@@ -65,15 +79,9 @@
             <Border Style="{StaticResource JpAdminCard}" MaxWidth="600">
                 <StackPanel Spacing="20" HorizontalAlignment="Center">
                     <!-- Icono central -->
-                    <Border Background="{StaticResource JpCrimsonBrush}" 
-                            CornerRadius="35" 
-                            Width="70" Height="70"
-                            HorizontalAlignment="Center">
-                        <TextBlock Text="??" 
-                                   FontSize="32" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center"/>
-                    </Border>
+                    <Button Style="{StaticResource JpRoundButton}" 
+                            Content="??" 
+                            IsEnabled="False"/>
                     
                     <TextBlock Text="{Binding Title}" 
                                Style="{StaticResource JpCardTitle}"
@@ -100,15 +108,10 @@
                 <!-- Gestión de Personal -->
                 <Border Grid.Column="0" Style="{StaticResource JpCard}" MinHeight="160">
                     <StackPanel Spacing="12" HorizontalAlignment="Center">
-                        <Border Background="{StaticResource JpBambooBrush}" 
-                                CornerRadius="20" 
-                                Width="40" Height="40"
-                                HorizontalAlignment="Center">
-                            <TextBlock Text="&#xE716;" 
-                                       Style="{StaticResource JpIcon}" 
-                                       Foreground="White" 
-                                       FontSize="16"/>
-                        </Border>
+                        <Button Style="{StaticResource JpRoundButtonGreen}" 
+                                Content="&#xE716;" 
+                                FontFamily="Segoe MDL2 Assets"
+                                IsEnabled="False"/>
                         <TextBlock Text="Gestión de Personal" 
                                    FontWeight="SemiBold" 
                                    FontSize="16"
@@ -123,15 +126,10 @@
                 <!-- Sistema POS -->
                 <Border Grid.Column="1" Style="{StaticResource JpCard}" MinHeight="160">
                     <StackPanel Spacing="12" HorizontalAlignment="Center">
-                        <Border Background="{StaticResource JpAccentBrush}" 
-                                CornerRadius="20" 
-                                Width="40" Height="40"
-                                HorizontalAlignment="Center">
-                            <TextBlock Text="&#xE7BF;" 
-                                       Style="{StaticResource JpIcon}" 
-                                       Foreground="White" 
-                                       FontSize="16"/>
-                        </Border>
+                        <Button Style="{StaticResource JpRoundButtonOrange}" 
+                                Content="&#xE7BF;" 
+                                FontFamily="Segoe MDL2 Assets"
+                                IsEnabled="False"/>
                         <TextBlock Text="Sistema POS" 
                                    FontWeight="SemiBold" 
                                    FontSize="16"
@@ -146,15 +144,11 @@
                 <!-- Reportes -->
                 <Border Grid.Column="2" Style="{StaticResource JpCard}" MinHeight="160">
                     <StackPanel Spacing="12" HorizontalAlignment="Center">
-                        <Border Background="{StaticResource JpGoldBrush}" 
-                                CornerRadius="20" 
-                                Width="40" Height="40"
-                                HorizontalAlignment="Center">
-                            <TextBlock Text="&#xE9D2;" 
-                                       Style="{StaticResource JpIcon}" 
-                                       Foreground="White" 
-                                       FontSize="16"/>
-                        </Border>
+                        <Button Style="{StaticResource JpRoundButton}" 
+                                Content="&#xE9D2;" 
+                                FontFamily="Segoe MDL2 Assets"
+                                Background="{StaticResource JpGoldBrush}"
+                                IsEnabled="False"/>
                         <TextBlock Text="Análisis y Reportes" 
                                    FontWeight="SemiBold" 
                                    FontSize="16"
@@ -169,7 +163,7 @@
         </StackPanel>
 
         <!-- Pie de página -->
-        <StackPanel Grid.Row="2" 
+        <StackPanel Grid.Row="3" 
                     VerticalAlignment="Bottom" 
                     HorizontalAlignment="Center" 
                     Spacing="12">

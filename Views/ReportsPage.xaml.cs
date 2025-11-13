@@ -18,9 +18,12 @@ using Microsoft.UI.Xaml.Navigation;
 
 namespace RestaurantJapanese.Views;
 
-public sealed partial class ReportsView : UserControl
+/// <summary>
+/// An empty page that can be used on its own or navigated to within a Frame.
+/// </summary>
+public sealed partial class ReportsPage : Page
 {
-    public ReportsView()
+    public ReportsPage()
     {
         InitializeComponent();
     }

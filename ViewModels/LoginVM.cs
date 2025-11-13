@@ -43,7 +43,7 @@ namespace RestaurantJapanese.ViewModels
                 Password = pwd;
 
             _ = SignInAsync(); // lanzar sin bloquear
-        });
+     });
 
         private async Task SignInAsync()
         {
@@ -62,44 +62,84 @@ namespace RestaurantJapanese.ViewModels
                 { Error = "Credenciales inválidas."; return; }
 
                 var role = (user.Role ?? "").Trim().ToLowerInvariant();
+                var displayName = user.DisplayName ?? user.UserName ?? "Usuario";
+
+                System.Diagnostics.Debug.WriteLine($"Login exitoso. Rol: {role}, UserId: {user.IdUser}");
 
                 if (role == "admin")
                 {
-                    // Navegar al panel de administración
+                    // Navegar al panel de administración usando ReplaceWindow para mantener historial
                     NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.AdminMenuView,
+<<<<<<< HEAD
                                                   RestaurantJapanese.ViewModels.AdminMenuVM>(OwnWindow!);
 
                     if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.AdminMenuVM vmAdmin)
+                    {
                         vmAdmin.OwnWindow = OwnWindow;
+                        vmAdmin.CurrentUserId = user.IdUser;
+                        vmAdmin.CurrentUserName = displayName;
+                        vmAdmin.CurrentUserRole = user.Role ?? "Admin";
+                    }
+=======
+                                                  RestaurantJapanese.ViewModels.AdminMenuVM>(
+                    OwnWindow!,
+                    init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        vm.CurrentUserId = user.IdUser;
+                    });
+>>>>>>> adding return buttons
                 }
                 else if (role == "empleado" || role == "cajero")
                 {
-                    // Navegar a POS; el VM cargará el menú automáticamente al asignar CurrentUserId
+                    // Navegar a POS usando ReplaceWindow para mantener historial  
                     NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.PosView,
+<<<<<<< HEAD
                                                   RestaurantJapanese.ViewModels.PosVM>(OwnWindow!);
 
                     if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.PosVM vmPos)
                     {
                         vmPos.OwnWindow = OwnWindow;
                         vmPos.CurrentUserId = user.IdUser; // dispara LoadMenuAsync dentro del setter
+                        vmPos.CurrentUserName = displayName;
                     }
+=======
+                                                  RestaurantJapanese.ViewModels.PosVM>(
+                    OwnWindow!,
+                    init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        vm.CurrentUserId = user.IdUser; // dispara LoadMenuAsync dentro del setter
+                    });
+>>>>>>> adding return buttons
                 }
                 else
                 {
-                    // Fallback → POS
+                    // Fallback → POS usando ReplaceWindow para mantener historial
                     NavigationHelper.ReplaceWindow<RestaurantJapanese.Views.PosView,
+<<<<<<< HEAD
                                                   RestaurantJapanese.ViewModels.PosVM>(OwnWindow!);
 
                     if ((OwnWindow?.Content as FrameworkElement)?.DataContext is RestaurantJapanese.ViewModels.PosVM vmPos)
                     {
                         vmPos.OwnWindow = OwnWindow;
                         vmPos.CurrentUserId = user.IdUser;
+                        vmPos.CurrentUserName = displayName;
                     }
+=======
+                                                  RestaurantJapanese.ViewModels.PosVM>(
+                    OwnWindow!,
+                    init: (vm, w) => {
+                        vm.OwnWindow = w;
+                        vm.CurrentUserId = user.IdUser;
+                    });
+>>>>>>> adding return buttons
                 }
+
+                System.Diagnostics.Debug.WriteLine("Navegación completada después del login");
             }
             catch (System.Exception ex)
             {
                 Error = ex.Message;
+                System.Diagnostics.Debug.WriteLine($"Error en login: {ex.Message}");
 
                 // (Opcional) Mensaje UI sencillo
                 var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;

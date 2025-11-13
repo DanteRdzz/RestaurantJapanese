@@ -1,6 +1,11 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:RestaurantJapanese.Converters">
+
+ <!-- ===== Converters ===== -->
+    <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
     <!-- ===== Paleta Japonesa Ampliada ===== -->
     <Color x:Key="JpSakuraPink">#FFF8E9</Color>
@@ -23,13 +28,13 @@
 
     <!-- Gradientes japoneses -->
     <LinearGradientBrush x:Key="JpGradientBg" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="{StaticResource JpSakuraPink}" Offset="0"/>
+      <GradientStop Color="{StaticResource JpSakuraPink}" Offset="0"/>
         <GradientStop Color="{StaticResource JpOffWhite}" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="JpCardGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="{StaticResource JpOffWhite}" Offset="0"/>
-        <GradientStop Color="{StaticResource JpLightGray}" Offset="1"/>
+ <GradientStop Color="{StaticResource JpOffWhite}" Offset="0"/>
+     <GradientStop Color="{StaticResource JpLightGray}" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- Brushes -->
@@ -42,7 +47,7 @@
     <SolidColorBrush x:Key="JpLineBrush" Color="{StaticResource JpLine}"/>
     <SolidColorBrush x:Key="JpGoldBrush" Color="{StaticResource JpGold}"/>
     <SolidColorBrush x:Key="JpBambooBrush" Color="{StaticResource JpBamboo}"/>
-    <SolidColorBrush x:Key="JpAccentBrush" Color="{StaticResource JpAccent}"/>
+  <SolidColorBrush x:Key="JpAccentBrush" Color="{StaticResource JpAccent}"/>
     <SolidColorBrush x:Key="JpShadowBrush" Color="{StaticResource JpShadow}"/>
 
     <!-- Radius -->
@@ -51,11 +56,36 @@
     <CornerRadius x:Key="JpRadiusM">12</CornerRadius>
     <CornerRadius x:Key="JpRadiusS">8</CornerRadius>
 
+<<<<<<< HEAD
     <!-- ===== Tipografía Mejorada ===== -->
+    <!-- Título principal de página -->
+    <Style x:Key="JpPageTitle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource JpTextBrush}"/>
+        <Setter Property="FontSize" Value="36"/>
+        <Setter Property="FontWeight" Value="Light"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="Margin" Value="0,20,0,30"/>
+    </Style>
+
+    <!-- Subtítulo de página -->
+    <Style x:Key="JpPageSubtitle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource JpMutedBrush}"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="LineHeight" Value="26"/>
+        <Setter Property="Margin" Value="0,0,0,20"/>
+    </Style>
+
+=======
+    <!-- ===== Tipograf�a Mejorada ===== -->
+>>>>>>> adding return buttons
     <Style x:Key="JpTitle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource JpTextBrush}"/>
         <Setter Property="FontSize" Value="32"/>
-        <Setter Property="FontWeight" Value="Light"/>
+   <Setter Property="FontWeight" Value="Light"/>
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
     </Style>
@@ -63,30 +93,30 @@
     <Style x:Key="JpSubtitle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource JpMutedBrush}"/>
         <Setter Property="FontSize" Value="16"/>
-        <Setter Property="FontWeight" Value="Normal"/>
+    <Setter Property="FontWeight" Value="Normal"/>
         <Setter Property="TextAlignment" Value="Center"/>
-        <Setter Property="FontFamily" Value="Segoe UI"/>
-        <Setter Property="LineHeight" Value="24"/>
-    </Style>
+  <Setter Property="FontFamily" Value="Segoe UI"/>
+    <Setter Property="LineHeight" Value="24"/>
+ </Style>
 
     <Style x:Key="JpCardTitle" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource JpTextBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource JpTextBrush}"/>
         <Setter Property="FontSize" Value="20"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+  <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
     </Style>
 
     <Style x:Key="JpCardDescription" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource JpMutedBrush}"/>
+     <Setter Property="Foreground" Value="{StaticResource JpMutedBrush}"/>
         <Setter Property="FontSize" Value="14"/>
-        <Setter Property="FontWeight" Value="Normal"/>
-        <Setter Property="TextWrapping" Value="Wrap"/>
+  <Setter Property="FontWeight" Value="Normal"/>
+ <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="LineHeight" Value="20"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
     </Style>
 
     <Style x:Key="JpErrorText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource JpCrimsonBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource JpCrimsonBrush}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -96,8 +126,8 @@
     <Style x:Key="JpCard" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource JpCardGradient}"/>
         <Setter Property="CornerRadius" Value="{StaticResource JpRadiusXL}"/>
-        <Setter Property="Padding" Value="32,28"/>
-        <Setter Property="BorderBrush" Value="{StaticResource JpLineBrush}"/>
+ <Setter Property="Padding" Value="32,28"/>
+     <Setter Property="BorderBrush" Value="{StaticResource JpLineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
@@ -111,7 +141,7 @@
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="Foreground" Value="{StaticResource JpTextBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource JpLineBrush}"/>
-        <Setter Property="BorderThickness" Value="2"/>
+     <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="CornerRadius" Value="{StaticResource JpRadiusM}"/>
         <Setter Property="Padding" Value="16,12"/>
         <Setter Property="Background" Value="{StaticResource JpSurfaceBrush}"/>
@@ -127,8 +157,9 @@
         <Setter Property="Padding" Value="16,12"/>
         <Setter Property="Background" Value="{StaticResource JpSurfaceBrush}"/>
         <Setter Property="IsPasswordRevealButtonEnabled" Value="True"/>
-        <Setter Property="PasswordRevealMode" Value="Peek"/>
+     <Setter Property="PasswordRevealMode" Value="Peek"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
+      <Setter Property="FlowDirection" Value="LeftToRight"/>
     </Style>
 
     <!-- ===== Botones Mejorados ===== -->
@@ -144,16 +175,70 @@
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="Template">
             <Setter.Value>
+      <ControlTemplate TargetType="Button">
+         <Grid>
+        <Border x:Name="Root"
+            Background="{TemplateBinding Background}"
+             CornerRadius="{TemplateBinding CornerRadius}">
+    <ContentPresenter
+    HorizontalAlignment="Center"
+    VerticalAlignment="Center"
+            Content="{TemplateBinding Content}"/>
+        </Border>
+
+        <VisualStateManager.VisualStateGroups>
+           <VisualStateGroup x:Name="CommonStates">
+ <VisualState x:Name="Normal"/>
+          <VisualState x:Name="PointerOver">
+      <VisualState.Setters>
+     <Setter Target="Root.Background" Value="{StaticResource JpCrimsonDarkBrush}"/>
+    </VisualState.Setters>
+                </VisualState>
+            <VisualState x:Name="Pressed">
+  <VisualState.Setters>
+      <Setter Target="Root.Background" Value="{StaticResource JpCrimsonDarkBrush}"/>
+           <Setter Target="Root.Opacity" Value="0.8"/>
+                </VisualState.Setters>
+       </VisualState>
+     <VisualState x:Name="Disabled">
+      <VisualState.Setters>
+    <Setter Target="Root.Opacity" Value="0.4"/>
+      </VisualState.Setters>
+            </VisualState>
+         </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    </Grid>
+     </ControlTemplate>
+         </Setter.Value>
+        </Setter>
+    </Style>
+
+<<<<<<< HEAD
+    <!-- Botón Redondo Grande -->
+    <Style x:Key="JpRoundButton" TargetType="Button">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource JpCrimsonBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Width" Value="80"/>
+        <Setter Property="Height" Value="80"/>
+        <Setter Property="CornerRadius" Value="40"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="Template">
+            <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid>
                         <Border x:Name="Root"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{TemplateBinding CornerRadius}">
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Content="{TemplateBinding Content}"/>
+                                CornerRadius="40"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}">
                         </Border>
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"/>
 
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
@@ -161,12 +246,13 @@
                                 <VisualState x:Name="PointerOver">
                                     <VisualState.Setters>
                                         <Setter Target="Root.Background" Value="{StaticResource JpCrimsonDarkBrush}"/>
+                                        <Setter Target="Root.Scale" Value="1.05"/>
                                     </VisualState.Setters>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <VisualState.Setters>
                                         <Setter Target="Root.Background" Value="{StaticResource JpCrimsonDarkBrush}"/>
-                                        <Setter Target="Root.Opacity" Value="0.8"/>
+                                        <Setter Target="Root.Scale" Value="0.95"/>
                                     </VisualState.Setters>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
@@ -182,22 +268,35 @@
         </Setter>
     </Style>
 
+    <!-- Botón Redondo Verde -->
+    <Style x:Key="JpRoundButtonGreen" TargetType="Button" BasedOn="{StaticResource JpRoundButton}">
+        <Setter Property="Background" Value="{StaticResource JpBambooBrush}"/>
+    </Style>
+
+    <!-- Botón Redondo Naranja -->
+    <Style x:Key="JpRoundButtonOrange" TargetType="Button" BasedOn="{StaticResource JpRoundButton}">
+        <Setter Property="Background" Value="{StaticResource JpAccentBrush}"/>
+    </Style>
+
     <!-- Botón Secundario -->
+=======
+    <!-- Bot�n Secundario -->
+>>>>>>> adding return buttons
     <Style x:Key="JpSecondaryButton" TargetType="Button" BasedOn="{StaticResource JpPrimaryButton}">
         <Setter Property="Background" Value="{StaticResource JpBambooBrush}"/>
     </Style>
 
-    <!-- Botón Accent -->
+    <!-- Bot�n Accent -->
     <Style x:Key="JpAccentButton" TargetType="Button" BasedOn="{StaticResource JpPrimaryButton}">
-        <Setter Property="Background" Value="{StaticResource JpAccentBrush}"/>
+   <Setter Property="Background" Value="{StaticResource JpAccentBrush}"/>
     </Style>
 
     <!-- ===== ListView Mejorado ===== -->
     <Style x:Key="JpListView" TargetType="ListView">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="CornerRadius" Value="{StaticResource JpRadiusM}"/>
-        <Setter Property="Padding" Value="8"/>
+    <Setter Property="CornerRadius" Value="{StaticResource JpRadiusM}"/>
+     <Setter Property="Padding" Value="8"/>
     </Style>
 
     <!-- ===== ContentDialog ===== -->
@@ -207,22 +306,22 @@
         <Setter Property="CornerRadius" Value="{StaticResource JpRadiusL}"/>
     </Style>
 
-    <!-- ===== Separador Japonés ===== -->
-    <Style x:Key="JpSeparator" TargetType="Rectangle">
-        <Setter Property="Height" Value="2"/>
+    <!-- ===== Separador Japon�s ===== -->
+<Style x:Key="JpSeparator" TargetType="Rectangle">
+    <Setter Property="Height" Value="2"/>
         <Setter Property="Fill" Value="{StaticResource JpGoldBrush}"/>
         <Setter Property="Margin" Value="0,16"/>
-        <Setter Property="RadiusX" Value="1"/>
+     <Setter Property="RadiusX" Value="1"/>
         <Setter Property="RadiusY" Value="1"/>
     </Style>
 
     <!-- ===== Icono Decorativo ===== -->
     <Style x:Key="JpIcon" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+     <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
         <Setter Property="FontSize" Value="24"/>
-        <Setter Property="Foreground" Value="{StaticResource JpGoldBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource JpGoldBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
+     <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
 </ResourceDictionary>
