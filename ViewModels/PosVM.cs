@@ -18,6 +18,19 @@ namespace RestaurantJapanese.ViewModels
 
         public Window? OwnWindow { get; set; }
 
+        // Configuración de límites de negocio
+        private const int MAX_ITEMS_IN_CART = 20; // Límite máximo de diferentes items en el carrito
+        private const int MAX_QUANTITY_PER_ITEM = 10; // Cantidad máxima por item individual
+        private const int MAX_TOTAL_ITEMS = 50; // Límite total de items (suma de todas las cantidades)
+
+        // Propiedades de usuario logueado
+        private string _currentUserName = "Usuario";
+        public string CurrentUserName
+        {
+            get => _currentUserName;
+            set => Set(ref _currentUserName, value);
+        }
+
         // Carga automática del menú al asignar el usuario
         private bool _menuLoaded;
         private int _currentUserId;
@@ -52,8 +65,18 @@ namespace RestaurantJapanese.ViewModels
         public int Qty
         {
             get => _qty;
-            set => Set(ref _qty, value < 1 ? 1 : value);
+            set => Set(ref _qty, value < 1 ? 1 : (value > MAX_QUANTITY_PER_ITEM ? MAX_QUANTITY_PER_ITEM : value));
         }
+
+        // Propiedades para mostrar información de límites
+        public int MaxItemsInCart => MAX_ITEMS_IN_CART;
+        public int MaxQuantityPerItem => MAX_QUANTITY_PER_ITEM;
+        public int MaxTotalItems => MAX_TOTAL_ITEMS;
+        
+        public int CurrentItemCount => Cart.Count;
+        public int CurrentTotalQuantity => Cart.Sum(x => x.Qty);
+        
+        public string CartStatus => $"{CurrentItemCount}/{MaxItemsInCart} productos • {CurrentTotalQuantity}/{MaxTotalItems} items";
 
         // Totales
         private decimal _tip = 0m;
@@ -62,7 +85,6 @@ namespace RestaurantJapanese.ViewModels
             get => _tip;
             set
             {
-                // Debug: Add console output to verify the setter is being called
                 System.Diagnostics.Debug.WriteLine($"[PosVM] Setting Tip from {_tip} to {value}");
                 Set(ref _tip, value);
                 Recalc();
@@ -93,11 +115,18 @@ namespace RestaurantJapanese.ViewModels
             set => Set(ref _error, value);
         }
 
+        private string? _warning;
+        public string? Warning
+        {
+            get => _warning;
+            set => Set(ref _warning, value);
+        }
+
         // Commands (sin async directo en RelayCommand)
         public ICommand LoadMenuCommand => new RelayCommand(_ => _ = LoadMenuAsync());
         public ICommand AddCommand => new RelayCommand(_ => AddSelected());
         public ICommand RemoveCommand => new RelayCommand(p => RemoveItem(p as CarItemModels));
-        public ICommand ClearCommand => new RelayCommand(_ => { Cart.Clear(); Recalc(); });
+        public ICommand ClearCommand => new RelayCommand(_ => { Cart.Clear(); Recalc(); UpdateCartStatus(); });
         public ICommand CheckoutCommand => new RelayCommand(_ => _ = CheckoutAsync());
 
         // ===== Lógica =====
@@ -116,10 +145,47 @@ namespace RestaurantJapanese.ViewModels
 
         private void AddSelected()
         {
-            if (Selected is null || Qty <= 0) return;
+            if (Selected is null || Qty <= 0) 
+            {
+                Error = "Selecciona un producto y cantidad válida.";
+                return;
+            }
 
-            var existing = Cart.FirstOrDefault(x => x.IdMenuItem == Selected.IdMenuItem);
-            if (existing is null)
+            // Validación de límites de negocio
+            var existingItem = Cart.FirstOrDefault(x => x.IdMenuItem == Selected.IdMenuItem);
+            var newQuantity = existingItem?.Qty + Qty ?? Qty;
+            var newTotalQuantity = CurrentTotalQuantity + Qty;
+
+            // Validar límite máximo de productos diferentes
+            if (existingItem == null && CurrentItemCount >= MAX_ITEMS_IN_CART)
+            {
+                Error = $"No puedes agregar más productos. Límite máximo: {MAX_ITEMS_IN_CART} productos diferentes.";
+                Warning = "Considera eliminar algunos productos antes de agregar nuevos.";
+                return;
+            }
+
+            // Validar cantidad máxima por item
+            if (newQuantity > MAX_QUANTITY_PER_ITEM)
+            {
+                Error = $"Cantidad máxima por producto: {MAX_QUANTITY_PER_ITEM} unidades.";
+                Warning = $"Intentaste agregar {Qty}, pero solo puedes tener {MAX_QUANTITY_PER_ITEM - (existingItem?.Qty ?? 0)} más de este producto.";
+                return;
+            }
+
+            // Validar límite total de items
+            if (newTotalQuantity > MAX_TOTAL_ITEMS)
+            {
+                Error = $"Límite total de items excedido. Máximo: {MAX_TOTAL_ITEMS} items en total.";
+                Warning = $"Tienes {CurrentTotalQuantity} items. Solo puedes agregar {MAX_TOTAL_ITEMS - CurrentTotalQuantity} más.";
+                return;
+            }
+
+            // Limpiar errores si llegamos aquí
+            Error = null;
+            Warning = null;
+
+            // Agregar al carrito
+            if (existingItem == null)
             {
                 Cart.Add(new CarItemModels
                 {
@@ -131,11 +197,15 @@ namespace RestaurantJapanese.ViewModels
             }
             else
             {
-                existing.Qty += Qty;
+                existingItem.Qty = newQuantity;
                 OnPropertyChanged(nameof(Cart)); // refresca UI del item
             }
 
             Recalc();
+            UpdateCartStatus();
+
+            // Mostrar advertencia si se está acercando a los límites
+            CheckLimitsWarning();
         }
 
         private void RemoveItem(CarItemModels? item)
@@ -143,6 +213,14 @@ namespace RestaurantJapanese.ViewModels
             if (item is null) return;
             Cart.Remove(item);
             Recalc();
+            UpdateCartStatus();
+            
+            // Limpiar errores si se quita un item
+            if (!string.IsNullOrEmpty(Error))
+            {
+                Error = null;
+                Warning = null;
+            }
         }
 
         private void Recalc()
@@ -151,7 +229,6 @@ namespace RestaurantJapanese.ViewModels
             Tax = System.Math.Round(Subtotal * TaxRate, 2);
             Total = Subtotal + Tax + Tip;
 
-            // Debug: Add console output to verify calculations
             System.Diagnostics.Debug.WriteLine($"[PosVM] Recalc - Subtotal: {Subtotal}, Tax: {Tax}, Tip: {Tip}, Total: {Total}");
 
             OnPropertyChanged(nameof(Subtotal));
@@ -159,39 +236,74 @@ namespace RestaurantJapanese.ViewModels
             OnPropertyChanged(nameof(Total));
         }
 
+        private void UpdateCartStatus()
+        {
+            OnPropertyChanged(nameof(CurrentItemCount));
+            OnPropertyChanged(nameof(CurrentTotalQuantity));
+            OnPropertyChanged(nameof(CartStatus));
+        }
+
+        private void CheckLimitsWarning()
+        {
+            var itemPercentage = (double)CurrentItemCount / MAX_ITEMS_IN_CART;
+            var quantityPercentage = (double)CurrentTotalQuantity / MAX_TOTAL_ITEMS;
+
+            if (itemPercentage >= 0.8 || quantityPercentage >= 0.8)
+            {
+                Warning = $"⚠️ Te estás acercando a los límites del carrito ({CurrentItemCount}/{MAX_ITEMS_IN_CART} productos, {CurrentTotalQuantity}/{MAX_TOTAL_ITEMS} items)";
+            }
+            else if (itemPercentage >= 0.9 || quantityPercentage >= 0.9)
+            {
+                Warning = $"🚨 Casi en el límite del carrito. Considera procesar la venta pronto.";
+            }
+        }
+
         private async Task CheckoutAsync()
         {
             Error = null;
+            Warning = null;
 
-            if (Cart.Count == 0) { Error = "Carrito vacío."; return; }
-            if (CurrentUserId <= 0) { Error = "Usuario inválido."; return; }
+            if (Cart.Count == 0) 
+            { 
+                Error = "Carrito vacío."; 
+                return; 
+            }
+            
+            if (CurrentUserId <= 0) 
+            { 
+                Error = "Usuario inválido."; 
+                return; 
+            }
 
             try
             {
                 var items = Cart.Select(c => (c.IdMenuItem, c.Qty));
                 
-                // Debug: Log the values being sent to CreateTicketAsync
                 System.Diagnostics.Debug.WriteLine($"[PosVM] CheckoutAsync - CreatedBy: {CurrentUserId}, Tip: {Tip}, TaxRate: {TaxRate}");
                 
                 var ticket = await _pos.CreateTicketAsync(CurrentUserId, Tip, TaxRate, items);
 
                 Cart.Clear();
-                Tip = 0m; // Reset tip after successful checkout
+                Tip = 0m;
                 Recalc();
+                UpdateCartStatus();
 
                 var msg =
+                    $"✅ Venta procesada exitosamente\n\n" +
                     $"Ticket #{ticket.Header.IdTicket}\n" +
+                    $"Fecha: {ticket.Header.CreatedAt:dd/MM/yyyy HH:mm}\n\n" +
                     $"Subtotal: {ticket.Header.Subtotal:C}\n" +
-                    $"IVA:      {ticket.Header.Tax:C}\n" +
+                    $"IVA (16%): {ticket.Header.Tax:C}\n" +
                     $"Propina:  {ticket.Header.Tip:C}\n" +
-                    $"Total:    {ticket.Header.Total:C}";
+                    $"━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                    $"TOTAL:    {ticket.Header.Total:C}";
 
                 var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
                 if (root is not null)
                 {
                     var dlg = new Microsoft.UI.Xaml.Controls.ContentDialog
                     {
-                        Title = "Venta registrada",
+                        Title = "🎉 Venta Registrada",
                         Content = msg,
                         CloseButtonText = "OK",
                         XamlRoot = root

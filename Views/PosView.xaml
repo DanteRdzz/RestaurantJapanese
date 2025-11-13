@@ -7,6 +7,7 @@
     <!-- Recursos -->
     <UserControl.Resources>
         <helpers:CurrencyConverterHelper x:Key="CurrencyConverter"/>
+        <helpers:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource JpGradientBg}" Padding="24">
@@ -15,15 +16,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- TÍTULO PRINCIPAL -->
-        <StackPanel Grid.Row="0"
-                    Spacing="12"
-                    Margin="0,0,0,16"
-                    HorizontalAlignment="Center">
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Spacing="12">
+        <!-- Título Principal de la Página -->
+        <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,16" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
                 <!-- Sin emojis -->
                 <TextBlock Text="Punto de Venta"
                            Style="{StaticResource JpPageTitle}"/>
@@ -36,33 +31,88 @@
             <StackPanel Orientation="Horizontal"
                         Spacing="16"
                         HorizontalAlignment="Center">
+                <!-- Información del usuario -->
                 <Border Background="{StaticResource JpSurfaceBrush}"
                         CornerRadius="{StaticResource JpRadiusM}"
                         Padding="12,8"
                         BorderBrush="{StaticResource JpGoldBrush}"
                         BorderThickness="1">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="&#xE82F;"
-                                   Style="{StaticResource JpIcon}"
-                                   FontSize="16"/>
-                        <TextBlock Text="Sistema de Ventas Activo"
-                                   Foreground="{StaticResource JpBambooBrush}"
-                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="Usuario:"
+                                   Foreground="{StaticResource JpMutedBrush}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentUserName}" 
+                                   Foreground="{StaticResource JpTextBrush}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
-                <!-- Botón Cargar menú más estándar -->
+                <!-- Estado del carrito -->
+                <Border Background="{StaticResource JpSurfaceBrush}"
+                        CornerRadius="{StaticResource JpRadiusM}"
+                        Padding="12,8"
+                        BorderBrush="{StaticResource JpBambooBrush}"
+                        BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding CartStatus}" 
+                                   Foreground="{StaticResource JpTextBrush}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Botón Cargar menú (texto normal) -->
                 <Button Content="Cargar menú"
-                        Command="{Binding LoadMenuCommand}"
                         Style="{StaticResource JpPrimaryButton}"
+                        Command="{Binding LoadMenuCommand}"
                         Padding="16,6"
                         Height="32"
                         MinWidth="130"
-                        ToolTipService.ToolTip="Cargar menú de productos"/>
+                        ToolTipService.ToolTip="Cargar menú"/>
+            </StackPanel>
+
+            <!-- Área de errores y advertencias -->
+            <StackPanel Spacing="8" Margin="0,8,0,0">
+                <!-- Error -->
+                <Border Background="{StaticResource JpCrimsonBrush}" 
+                        CornerRadius="8" 
+                        Padding="12,8"
+                        Visibility="{Binding Error, Converter={StaticResource StringToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Error:"
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Error}" 
+                                   Foreground="White" 
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Warning -->
+                <Border Background="{StaticResource JpAccentBrush}" 
+                        CornerRadius="8" 
+                        Padding="12,8"
+                        Visibility="{Binding Warning, Converter={StaticResource StringToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Advertencia:"
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Warning}" 
+                                   Foreground="White" 
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </StackPanel>
 
-        <!-- CONTENIDO: 2 columnas (menú + carrito) -->
+        <!-- CONTENIDO: 2 columnas (carrito más ancho) -->
         <Grid Grid.Row="1" ColumnSpacing="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2.6*"/>
@@ -72,16 +122,12 @@
             </Grid.ColumnDefinitions>
 
             <!-- ========== IZQUIERDA: MENÚ ========== -->
-            <Border Grid.Column="0"
-                    Style="{StaticResource JpAdminCard}">
+            <Border Grid.Column="0" Style="{StaticResource JpAdminCard}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- Header -->
                         <RowDefinition Height="*"/>
-                        <!-- Lista menú -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Cantidad + botón -->
                     </Grid.RowDefinitions>
 
                     <!-- Header menú -->
@@ -89,8 +135,8 @@
                                 Orientation="Horizontal"
                                 Spacing="12"
                                 Margin="0,0,0,8">
-                        <Button Style="{StaticResource JpRoundButton}"
-                                Content="&#xE7C7;"
+                        <Button Style="{StaticResource JpRoundButton}" 
+                                Content="&#xE7C7;" 
                                 FontFamily="Segoe MDL2 Assets"
                                 IsEnabled="False"
                                 Width="32"
@@ -122,7 +168,6 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-
                                                 <StackPanel>
                                                     <TextBlock Text="{Binding Name}"
                                                                FontWeight="SemiBold"
@@ -134,7 +179,6 @@
                                                                FontSize="14"
                                                                Margin="0,4,0,0"/>
                                                 </StackPanel>
-
                                                 <Border Grid.Column="1"
                                                         Background="{StaticResource JpGoldBrush}"
                                                         CornerRadius="15"
@@ -169,11 +213,17 @@
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource JpTextBrush}"/>
 
-                            <NumberBox Width="120"
-                                       Minimum="1"
+                            <NumberBox Width="120" 
+                                       Minimum="1" 
+                                       Maximum="{Binding MaxQuantityPerItem}"
                                        Value="{Binding Qty, Mode=TwoWay}"
                                        CornerRadius="{StaticResource JpRadiusS}"
                                        FontSize="16"/>
+
+                            <TextBlock Text="(máx: 10)" 
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource JpMutedBrush}"
+                                       FontSize="12"/>
 
                             <Button Content="Agregar al carrito"
                                     Style="{StaticResource JpPrimaryButton}"
@@ -187,20 +237,20 @@
                 </Grid>
             </Border>
 
-            <!-- ========== DERECHA: CARRITO + TOTALES ========== -->
+            <!-- ========== DERECHA: CARRITO + TOTALES ABAJO ========== -->
             <Border Grid.Column="1"
                     Style="{StaticResource JpAdminCard}"
                     MinWidth="420">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- Header carrito -->
+                        <!-- header carrito -->
                         <RowDefinition Height="*"/>
-                        <!-- Lista carrito -->
+                        <!-- lista carrito -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Botones carrito -->
+                        <!-- botones carrito -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Totales + checkout -->
+                        <!-- totales + checkout -->
                     </Grid.RowDefinitions>
 
                     <!-- Header carrito -->
@@ -208,8 +258,8 @@
                                 Orientation="Horizontal"
                                 Spacing="12"
                                 Margin="0,0,0,8">
-                        <Button Style="{StaticResource JpRoundButtonOrange}"
-                                Content="&#xE7BF;"
+                        <Button Style="{StaticResource JpRoundButtonOrange}" 
+                                Content="&#xE7BF;" 
                                 FontFamily="Segoe MDL2 Assets"
                                 IsEnabled="False"
                                 Width="32"
@@ -303,7 +353,7 @@
                                 MinWidth="140"/>
                     </StackPanel>
 
-                    <!-- Totales + Checkout -->
+                    <!-- Totales + Checkout (botón centrado abajo) -->
                     <Border Grid.Row="3"
                             Margin="0,10,0,0"
                             Background="{StaticResource JpSurfaceBrush}"

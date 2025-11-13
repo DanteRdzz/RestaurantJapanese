@@ -10,305 +10,211 @@
         <helpers:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource JpGradientBg}" Padding="28">
+    <Grid Background="{StaticResource JpGradientBg}" Padding="24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Título Principal de la Página -->
         <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Spacing="12">
-                <!-- Sin emojis -->
-                <TextBlock Text="Inventario de Menú"
-                           Style="{StaticResource JpPageTitle}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                <TextBlock Text="🍣" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Inventario de Menú" Style="{StaticResource JpPageTitle}"/>
+                <TextBlock Text="🍣" FontSize="32" VerticalAlignment="Center"/>
             </StackPanel>
-
-            <Rectangle Style="{StaticResource JpSeparator}"
-                       Width="420"
-                       HorizontalAlignment="Center"/>
-
+            <Rectangle Style="{StaticResource JpSeparator}" Width="420" HorizontalAlignment="Center"/>
             <TextBlock Text="Administra platillos, descripciones, precios y disponibilidad"
-                       Style="{StaticResource JpPageSubtitle}"
-                       HorizontalAlignment="Center"/>
+                       Style="{StaticResource JpPageSubtitle}" HorizontalAlignment="Center"/>
+            
+            <!-- Navigation tabs -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <RadioButton Content="Listar" IsChecked="{Binding IsListSelected, Mode=TwoWay}" GroupName="Section"/>
+                <RadioButton Content="Buscar" IsChecked="{Binding IsSearchSelected, Mode=TwoWay}" GroupName="Section"/>
+                <RadioButton Content="Crear" IsChecked="{Binding IsCreateSelected, Mode=TwoWay}" GroupName="Section"/>
+                <RadioButton Content="Editar" IsChecked="{Binding IsUpdateSelected, Mode=TwoWay}" GroupName="Section"/>
+                <RadioButton Content="Dar de baja" IsChecked="{Binding IsDeleteSelected, Mode=TwoWay}" GroupName="Section"/>
+            </StackPanel>
         </StackPanel>
 
-        <!-- Barra de filtros / acciones (card superior) -->
-        <Border Grid.Row="1"
-                Background="{StaticResource JpSurfaceBrush}"
-                CornerRadius="{StaticResource JpRadiusL}"
-                Padding="12"
-                Margin="0,0,0,20"
-                BorderBrush="{StaticResource JpLineBrush}"
-                BorderThickness="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Título mini -->
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Button Style="{StaticResource JpRoundButtonGreen}" 
-                            Content="&#xE7C7;" 
-                            FontFamily="Segoe MDL2 Assets"
-                            IsEnabled="False"
-                            Width="32"
-                            Height="32"/>
-                    <TextBlock Text="Listado de productos"
-                               Style="{StaticResource JpCardTitle}"
-                               VerticalAlignment="Center"/>
+        <!-- Content sections -->
+        <Grid Grid.Row="1">
+            <!-- List section -->
+            <StackPanel Visibility="{Binding ListVisibility}" Spacing="16">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <ToggleSwitch Header="Solo activos" IsOn="{Binding OnlyActive, Mode=TwoWay}"/>
+                    <Button Content="Cargar productos" Command="{Binding LoadAllCommand}" Style="{StaticResource JpPrimaryButton}"/>
                 </StackPanel>
-
-                <!-- Solo activos -->
-                <ToggleSwitch Grid.Column="1"
-                              Margin="16,0,0,0"
-                              Header="Solo activos"
-                              IsOn="{Binding OnlyActive, Mode=TwoWay}"/>
-
-                <!-- Búsqueda -->
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            Spacing="10"
-                            HorizontalAlignment="Right">
-                    <TextBox Width="320"
-                             PlaceholderText="Buscar por nombre o descripción…"
-                             Style="{StaticResource JpTextBox}"
-                             Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-
-                <!-- Refrescar -->
-                <Button Grid.Column="3"
-                        Content="Refrescar"
-                        Style="{StaticResource JpPrimaryButton}"
-                        Command="{Binding LoadCommand}"
-                        MinWidth="120"
-                        Height="32"
-                        Padding="14,6"/>
-            </Grid>
-        </Border>
-
-        <!-- Contenido principal: LISTA + FORMULARIO (2 columnas) -->
-        <Grid Grid.Row="2"
-              ColumnSpacing="20"
-              RowSpacing="20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- LISTA (card) -->
-            <Border Grid.Column="0"
-                    Style="{StaticResource JpAdminCard}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Encabezados -->
-                    <Border Grid.Row="0"
-                            Background="{StaticResource JpGoldBrush}"
-                            Padding="12,8"
-                            CornerRadius="10,10,0,0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="240"/>
-                                <ColumnDefinition Width="140"/>
-                                <ColumnDefinition Width="100"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="ID"
-                                       Foreground="White"
-                                       FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="Nombre"
-                                       Foreground="White"
-                                       FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="Descripción"
-                                       Foreground="White"
-                                       FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="3"
-                                       Text="Precio"
-                                       Foreground="White"
-                                       FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="4"
-                                       Text="Activo"
-                                       Foreground="White"
-                                       FontWeight="SemiBold"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Lista -->
-                    <ListView Grid.Row="1"
-                              ItemsSource="{Binding Items}"
-                              SelectedItem="{Binding Selected, Mode=TwoWay}"
-                              SelectionMode="Single"
-                              Style="{StaticResource JpListView}">
+                
+                <Border Style="{StaticResource JpAdminCard}" Height="500">
+                    <ListView ItemsSource="{Binding Items}" SelectedItem="{Binding Selected, Mode=TwoWay}" Style="{StaticResource JpListView}">
+                        <ListView.Header>
+                            <Grid Padding="8" Background="{StaticResource JpGoldBrush}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="80"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="ID" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1" Text="Nombre" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="2" Text="Descripción" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="3" Text="Precio" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="4" Text="Activo" Foreground="White" FontWeight="SemiBold"/>
+                            </Grid>
+                        </ListView.Header>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Border Padding="10"
-                                        BorderBrush="{StaticResource JpLineBrush}"
-                                        BorderThickness="0,0,0,1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="80"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="240"/>
-                                            <ColumnDefinition Width="140"/>
-                                            <ColumnDefinition Width="100"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Text="{Binding IdMenuItem}"
-                                                   VerticalAlignment="Center"/>
-
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Name}"
-                                                   FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"/>
-
-                                        <TextBlock Grid.Column="2"
-                                                   Text="{Binding Description}"
-                                                   Foreground="{StaticResource JpMutedBrush}"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   VerticalAlignment="Center"/>
-
-                                        <TextBlock Grid.Column="3"
-                                                   Text="{Binding Price, Converter={StaticResource CurrencyConverter}}"
-                                                   VerticalAlignment="Center"/>
-
-                                        <CheckBox Grid.Column="4"
-                                                  IsChecked="{Binding IsActive}"
-                                                  IsEnabled="False"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
+                                <Grid Padding="8" BorderBrush="{StaticResource JpLineBrush}" BorderThickness="0,0,0,1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding IdMenuItem}" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" Text="{Binding Description}" VerticalAlignment="Center" 
+                                               TextTrimming="CharacterEllipsis" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Price, Converter={StaticResource CurrencyConverter}}" VerticalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding IsActive}" IsEnabled="False" HorizontalAlignment="Center"/>
+                                </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                </Grid>
-            </Border>
+                </Border>
+            </StackPanel>
 
-            <!-- FORMULARIO (card) -->
-            <Border Grid.Column="1"
-                    Style="{StaticResource JpAdminCard}">
-                <!-- Grid con filas para fijar la botonera abajo -->
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <!-- header + error -->
-                        <RowDefinition Height="*"/>
-                        <!-- campos -->
-                        <RowDefinition Height="Auto"/>
-                        <!-- botones -->
-                    </Grid.RowDefinitions>
+            <!-- Search section -->
+            <StackPanel Visibility="{Binding SearchVisibility}" Spacing="16">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBox PlaceholderText="Buscar productos..." Text="{Binding Search, Mode=TwoWay}" Width="300"/>
+                    <ToggleSwitch Header="Solo activos" IsOn="{Binding OnlyActive, Mode=TwoWay}"/>
+                    <Button Content="Buscar" Command="{Binding SearchCommand}" Style="{StaticResource JpPrimaryButton}"/>
+                </StackPanel>
+                
+                <Border Style="{StaticResource JpAdminCard}" Height="500">
+                    <ListView ItemsSource="{Binding Items}" SelectedItem="{Binding Selected, Mode=TwoWay}" Style="{StaticResource JpListView}">
+                        <ListView.Header>
+                            <Grid Padding="8" Background="{StaticResource JpGoldBrush}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="80"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="ID" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1" Text="Nombre" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="2" Text="Descripción" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="3" Text="Precio" Foreground="White" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="4" Text="Activo" Foreground="White" FontWeight="SemiBold"/>
+                            </Grid>
+                        </ListView.Header>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding IdMenuItem}" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" Text="{Binding Description}" VerticalAlignment="Center" 
+                                               TextTrimming="CharacterEllipsis" Foreground="{StaticResource JpMutedBrush}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Price, Converter={StaticResource CurrencyConverter}}" VerticalAlignment="Center"/>
+                                    <CheckBox Grid.Column="4" IsChecked="{Binding IsActive}" IsEnabled="False" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+            </StackPanel>
 
-                    <!-- Header del formulario -->
-                    <StackPanel Grid.Row="0"
-                                Orientation="Horizontal"
-                                Spacing="10"
-                                Margin="0,0,0,4">
-                        <Button Style="{StaticResource JpRoundButton}" 
-                                Content="&#xE70F;" 
-                                FontFamily="Segoe MDL2 Assets"
-                                IsEnabled="False"
-                                Width="32"
-                                Height="32"/>
-                        <TextBlock Text="Editar / Crear"
-                                   Style="{StaticResource JpCardTitle}"
-                                   VerticalAlignment="Center"/>
+            <!-- Create section -->
+            <StackPanel Visibility="{Binding CreateVisibility}" Spacing="16">
+                <TextBlock Text="Crear nuevo producto" Style="{StaticResource JpCardTitle}"/>
+                
+                <Border Style="{StaticResource JpAdminCard}" Padding="20">
+                    <StackPanel Spacing="12" MaxWidth="600">
+                        <TextBox PlaceholderText="Nombre del producto *" Text="{Binding Name, Mode=TwoWay}" Style="{StaticResource JpTextBox}"/>
+                        <TextBox PlaceholderText="Descripción" Text="{Binding Description, Mode=TwoWay}" 
+                                 Style="{StaticResource JpTextBox}" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
+                        <TextBox PlaceholderText="Precio (ej: 100.50) *" Text="{Binding PriceText, Mode=TwoWay}" 
+                                 Style="{StaticResource JpTextBox}" InputScope="Number"/>
+                        <CheckBox Content="Producto activo" IsChecked="{Binding IsActive, Mode=TwoWay}"/>
                     </StackPanel>
+                </Border>
+                
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button Content="Crear producto" Command="{Binding CreateCommand}" Style="{StaticResource JpPrimaryButton}" MinWidth="140"/>
+                    <Button Content="Limpiar" Command="{Binding ClearCreateCommand}" Style="{StaticResource JpSecondaryButton}" MinWidth="100"/>
+                </StackPanel>
+            </StackPanel>
 
-                    <!-- Área de errores -->
-                    <Border Grid.Row="0" 
-                            Background="{StaticResource JpCrimsonBrush}" 
-                            CornerRadius="8" 
-                            Padding="12,8"
-                            Margin="0,32,0,0"
-                            Visibility="{Binding Error, Converter={StaticResource StringToVisibilityConverter}}">
-                        <TextBlock Text="{Binding Error}" 
-                                   Foreground="White" 
-                                   FontWeight="SemiBold"
-                                   TextWrapping="Wrap"
-                                   VerticalAlignment="Center"/>
-                    </Border>
-
-                    <!-- Campos con scroll -->
-                    <ScrollViewer Grid.Row="1"
-                                  VerticalScrollBarVisibility="Auto"
-                                  Margin="0,4,0,0">
-                        <StackPanel Spacing="14">
-                            <TextBox PlaceholderText="Nombre"
-                                     Style="{StaticResource JpTextBox}"
-                                     Text="{Binding Name, Mode=TwoWay}"/>
-
-                            <TextBox PlaceholderText="Descripción"
-                                     Style="{StaticResource JpTextBox}"
-                                     Text="{Binding Description, Mode=TwoWay}"
-                                     TextWrapping="Wrap"
-                                     AcceptsReturn="True"
-                                     Height="90"/>
-
-                            <TextBox PlaceholderText="Precio (ej: 100.50)"
-                                     Style="{StaticResource JpTextBox}"
-                                     Text="{Binding PriceText, Mode=TwoWay}"
-                                     InputScope="Number"/>
-
-                            <CheckBox Content="Producto activo"
-                                      IsChecked="{Binding IsActive, Mode=TwoWay}"
-                                      FontSize="16"
-                                      FontWeight="SemiBold"/>
+            <!-- Update section -->
+            <StackPanel Visibility="{Binding UpdateVisibility}" Spacing="16">
+                <TextBlock Text="Editar producto seleccionado" Style="{StaticResource JpCardTitle}"/>
+                
+                <Border Style="{StaticResource JpAdminCard}" Padding="20">
+                    <StackPanel Spacing="12" MaxWidth="600">
+                        <TextBox PlaceholderText="Nombre del producto" Text="{Binding Name, Mode=TwoWay}" Style="{StaticResource JpTextBox}"/>
+                        <TextBox PlaceholderText="Descripción" Text="{Binding Description, Mode=TwoWay}" 
+                                 Style="{StaticResource JpTextBox}" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
+                        <TextBox PlaceholderText="Precio (ej: 100.50)" Text="{Binding PriceText, Mode=TwoWay}" 
+                                 Style="{StaticResource JpTextBox}" InputScope="Number"/>
+                        <CheckBox Content="Producto activo" IsChecked="{Binding IsActive, Mode=TwoWay}"/>
+                        
+                        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
+                            <!-- Botón "Nuevo" removido como solicitaste -->
+                            <Button Content="Guardar cambios" Command="{Binding SaveCommand}" Style="{StaticResource JpPrimaryButton}" MinWidth="140"/>
                         </StackPanel>
-                    </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
 
-                    <!-- Botonera fija abajo a la derecha -->
-                    <Grid Grid.Row="2" Margin="2,8,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+            <!-- Delete section -->
+            <StackPanel Visibility="{Binding DeleteVisibility}" Spacing="16">
+                <TextBlock Text="Dar de baja producto" Style="{StaticResource JpCardTitle}"/>
+                
+                <Border Style="{StaticResource JpAdminCard}" Padding="20">
+                    <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBox PlaceholderText="ID del producto" Text="{Binding IdLookup, Mode=TwoWay}" Width="200"/>
+                            <Button Content="Buscar" Command="{Binding LoadByIdCommand}" Style="{StaticResource JpSecondaryButton}"/>
+                        </StackPanel>
+                        
+                        <StackPanel Visibility="{Binding Selected, Converter={StaticResource StringToVisibilityConverter}}" Spacing="8" Margin="0,12,0,0">
+                            <TextBlock Text="{Binding Selected.Name}" FontWeight="SemiBold" FontSize="16"/>
+                            <TextBlock Text="{Binding Selected.Description}" Foreground="{StaticResource JpMutedBrush}"/>
+                            <TextBlock FontWeight="SemiBold">
+                                <Run Text="Precio: "/>
+                                <Run Text="{Binding Selected.Price, Converter={StaticResource CurrencyConverter}}"/>
+                            </TextBlock>
+                            
+                            <Button Content="Dar de baja" Command="{Binding SoftDeleteCommand}" 
+                                    Style="{StaticResource JpPrimaryButton}" 
+                                    MinWidth="140" Margin="0,12,0,0"
+                                    Background="DarkRed"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
 
-                        <Border Grid.Column="0" Background="Transparent"/>
-
-                        <Button Grid.Column="1"
-                                Content="Nuevo"
-                                Style="{StaticResource JpSecondaryButton}"
-                                Command="{Binding NewCommand}"
-                                Padding="14,6"
-                                MinWidth="100"
-                                Height="32"
-                                Margin="0,0,8,0"/>
-
-                        <Button Grid.Column="2"
-                                Content="Guardar"
-                                Style="{StaticResource JpPrimaryButton}"
-                                Command="{Binding SaveCommand}"
-                                Padding="14,6"
-                                MinWidth="110"
-                                Height="32"
-                                Margin="0,0,8,0"/>
-
-                        <Button Grid.Column="3"
-                                Content="Dar de baja"
-                                Style="{StaticResource JpPrimaryButton}"
-                                Command="{Binding DeleteCommand}"
-                                Padding="14,6"
-                                MinWidth="120"
-                                Height="32"/>
-                    </Grid>
-                </Grid>
-            </Border>
+            <!-- Error display -->
+            <TextBlock Text="{Binding Error}" Style="{StaticResource JpErrorText}" 
+                       VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                       Visibility="{Binding Error, Converter={StaticResource StringToVisibilityConverter}}"
+                       Margin="0,0,0,20"/>
         </Grid>
     </Grid>
 </UserControl>
