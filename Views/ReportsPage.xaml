@@ -4,89 +4,152 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:models="using:RestaurantJapanese.Models">
 
-    <Grid Padding="12" RowSpacing="8">
+    <Grid Background="{StaticResource JpGradientBg}" Padding="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- filtros -->
             <RowDefinition Height="Auto"/>
-            <!-- header -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <!-- lista -->
             <RowDefinition Height="Auto"/>
-            <!-- totales -->
         </Grid.RowDefinitions>
 
-        <!-- Filtros -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Desde:" VerticalAlignment="Center"/>
-            <DatePicker Width="200" Date="{Binding FromDateOffset, Mode=TwoWay}"/>
-
-            <TextBlock Text="Hasta:" Margin="12,0,0,0" VerticalAlignment="Center"/>
-            <DatePicker Width="200" Date="{Binding ToDateOffset, Mode=TwoWay}"/>
-
-            <Button Content="Cargar" Margin="12,0,0,0" Command="{Binding LoadCommand}"/>
-            <Button Content="Hoy" Margin="8,0,0,0" Command="{Binding QuickTodayCommand}"/>
-            <Button Content="Todos" Margin="8,0,0,0" Command="{Binding QuickAllCommand}" 
-                    ToolTipService.ToolTip="Mostrar todos los registros"/>
+        <!-- Título Principal de la Página -->
+        <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,16" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                <!-- Quité los emojis, solo dejo el título -->
+                <TextBlock Text="Reportes de Ventas" Style="{StaticResource JpPageTitle}"/>
+            </StackPanel>
+            <Rectangle Style="{StaticResource JpSeparator}" Width="200" HorizontalAlignment="Center"/>
+            <TextBlock Text="Analiza las ventas de tu restaurante japonés con detalle y precisión"
+                       Style="{StaticResource JpPageSubtitle}"
+                       TextAlignment="Center"/>
         </StackPanel>
+
+        <!-- Filtros -->
+        <Border Grid.Row="1" 
+                Background="{StaticResource JpSurfaceBrush}"
+                CornerRadius="{StaticResource JpRadiusL}"
+                Padding="20"
+                Margin="0,0,0,16"
+                BorderBrush="{StaticResource JpLineBrush}"
+                BorderThickness="1">
+            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                <TextBlock Text="Desde:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                <DatePicker Width="200" Date="{Binding FromDateOffset, Mode=TwoWay}"/>
+
+                <TextBlock Text="Hasta:" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                <DatePicker Width="200" Date="{Binding ToDateOffset, Mode=TwoWay}"/>
+
+                <!-- Botones tamaño normal -->
+                <Button Content="Cargar"
+                        Margin="12,0,0,0"
+                        Command="{Binding LoadCommand}"
+                        Style="{StaticResource JpPrimaryButton}"
+                        Height="32"
+                        Padding="10,4"/>
+
+                <Button Content="Hoy"
+                        Margin="8,0,0,0"
+                        Command="{Binding QuickTodayCommand}"
+                        Style="{StaticResource JpSecondaryButton}"
+                        Height="32"
+                        Padding="10,4"/>
+
+                <Button Content="Todos"
+                        Margin="8,0,0,0"
+                        Command="{Binding QuickAllCommand}"
+                        Style="{StaticResource JpAccentButton}"
+                        Height="32"
+                        Padding="10,4"
+                        ToolTipService.ToolTip="Mostrar todos los registros"/>
+            </StackPanel>
+        </Border>
 
         <!-- Encabezado de columnas -->
-        <Grid Grid.Row="1" ColumnSpacing="12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="180"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="IdTicket" FontWeight="SemiBold"/>
-            <TextBlock Grid.Column="1" Text="Fecha/Hora" FontWeight="SemiBold"/>
-            <TextBlock Grid.Column="2" Text="Subtotal" FontWeight="SemiBold"/>
-            <TextBlock Grid.Column="3" Text="Impuesto" FontWeight="SemiBold"/>
-            <TextBlock Grid.Column="4" Text="Total" FontWeight="SemiBold"/>
-        </Grid>
+        <Border Grid.Row="2" 
+                Background="{StaticResource JpSurfaceBrush}"
+                CornerRadius="{StaticResource JpRadiusM}"
+                Padding="16,12"
+                Margin="0,0,0,8"
+                BorderBrush="{StaticResource JpGoldBrush}"
+                BorderThickness="2">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID Ticket" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+                <TextBlock Grid.Column="1" Text="Fecha/Hora" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+                <TextBlock Grid.Column="2" Text="Subtotal" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+                <TextBlock Grid.Column="3" Text="Impuesto" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+                <TextBlock Grid.Column="4" Text="Total" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+            </Grid>
+        </Border>
 
         <!-- Lista -->
-        <ListView Grid.Row="2" ItemsSource="{Binding Items}">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:SalesReportRowModel">
-                    <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="180"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+        <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto">
+            <ListView ItemsSource="{Binding Items}" 
+                      Background="Transparent"
+                      BorderThickness="0">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:SalesReportRowModel">
+                        <Border Background="{StaticResource JpSurfaceBrush}"
+                                CornerRadius="{StaticResource JpRadiusS}"
+                                Padding="16,12"
+                                Margin="0,2"
+                                BorderBrush="{StaticResource JpLineBrush}"
+                                BorderThickness="1">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" Text="{x:Bind IdTicket}"/>
-                        <TextBlock Grid.Column="1" Text="{x:Bind FormattedDate}"/>
-                        <TextBlock Grid.Column="2" Text="{x:Bind Subtotal}"/>
-                        <TextBlock Grid.Column="3" Text="{x:Bind Tax}"/>
-                        <TextBlock Grid.Column="4" Text="{x:Bind Total}"/>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                                <TextBlock Grid.Column="0" Text="{x:Bind IdTicket}" Foreground="{StaticResource JpTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{x:Bind FormattedDate}" Foreground="{StaticResource JpTextBrush}"/>
+                                <TextBlock Grid.Column="2" Text="{x:Bind Subtotal}" Foreground="{StaticResource JpTextBrush}"/>
+                                <TextBlock Grid.Column="3" Text="{x:Bind Tax}" Foreground="{StaticResource JpTextBrush}"/>
+                                <TextBlock Grid.Column="4" Text="{x:Bind Total}" FontWeight="SemiBold" Foreground="{StaticResource JpCrimsonBrush}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </ScrollViewer>
 
         <!-- Totales -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="16">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="Tickets:"/>
-                <TextBlock Text="{Binding TotalTickets}" FontWeight="SemiBold"/>
+        <Border Grid.Row="5" 
+                Background="{StaticResource JpCardGradient}"
+                CornerRadius="{StaticResource JpRadiusL}"
+                Padding="20,16"
+                Margin="0,16,0,0"
+                BorderBrush="{StaticResource JpGoldBrush}"
+                BorderThickness="2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="24">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Tickets:" FontWeight="SemiBold" Foreground="{StaticResource JpTextBrush}"/>
+                    <TextBlock Text="{Binding TotalTickets}" FontWeight="Bold" Foreground="{StaticResource JpCrimsonBrush}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Subtotal:" FontWeight="SemiBold" Foreground="{StaticResource JpTextBrush}"/>
+                    <TextBlock Text="{Binding SumSubtotal}" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Impuesto:" FontWeight="SemiBold" Foreground="{StaticResource JpTextBrush}"/>
+                    <TextBlock Text="{Binding SumTax}" FontWeight="Bold" Foreground="{StaticResource JpTextBrush}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="TOTAL:" FontWeight="Bold" FontSize="16" Foreground="{StaticResource JpTextBrush}"/>
+                    <TextBlock Text="{Binding SumTotal}" FontWeight="Bold" FontSize="16" Foreground="{StaticResource JpCrimsonBrush}"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="Subtotal:"/>
-                <TextBlock Text="{Binding SumSubtotal}" FontWeight="SemiBold"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="Impuesto:"/>
-                <TextBlock Text="{Binding SumTax}" FontWeight="SemiBold"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="TOTAL:"/>
-                <TextBlock Text="{Binding SumTotal}" FontWeight="Bold"/>
-            </StackPanel>
-        </StackPanel>
+        </Border>
     </Grid>
 </Page>

@@ -17,16 +17,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Encabezado elegante -->
+        <!-- Título Principal de la Página -->
         <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-                <TextBlock Text="🍣" FontSize="28" VerticalAlignment="Center"/>
-                <TextBlock Text="Inventario de Menú" Style="{StaticResource JpTitle}"/>
-                <TextBlock Text="🍣" FontSize="28" VerticalAlignment="Center"/>
+                <TextBlock Text="🍣" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Inventario de Menú" Style="{StaticResource JpPageTitle}"/>
+                <TextBlock Text="🍣" FontSize="32" VerticalAlignment="Center"/>
             </StackPanel>
             <Rectangle Style="{StaticResource JpSeparator}" Width="420" HorizontalAlignment="Center"/>
             <TextBlock Text="Administra platillos, descripciones, precios y disponibilidad"
-                       Style="{StaticResource JpSubtitle}" HorizontalAlignment="Center"/>
+                       Style="{StaticResource JpPageSubtitle}" HorizontalAlignment="Center"/>
         </StackPanel>
 
         <!-- Barra de filtros / acciones (card superior) -->
@@ -47,10 +47,10 @@
 
                 <!-- Título mini -->
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Border Background="{StaticResource JpBambooBrush}" CornerRadius="18" Width="36" Height="36">
-                        <TextBlock Text="&#xE7C7;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="16"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                    <Button Style="{StaticResource JpRoundButtonGreen}" 
+                            Content="&#xE7C7;" 
+                            FontFamily="Segoe MDL2 Assets"
+                            IsEnabled="False"/>
                     <TextBlock Text="Listado de productos" Style="{StaticResource JpCardTitle}" VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -174,10 +174,10 @@
 
                     <!-- Header del formulario -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,4">
-                        <Border Background="{StaticResource JpCrimsonBrush}" CornerRadius="18" Width="36" Height="36">
-                            <TextBlock Text="&#xE70F;" Style="{StaticResource JpIcon}" Foreground="White" FontSize="16"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        <Button Style="{StaticResource JpRoundButton}" 
+                                Content="&#xE70F;" 
+                                FontFamily="Segoe MDL2 Assets"
+                                IsEnabled="False"/>
                         <TextBlock Text="Editar / Crear" Style="{StaticResource JpCardTitle}" VerticalAlignment="Center"/>
                     </StackPanel>
 

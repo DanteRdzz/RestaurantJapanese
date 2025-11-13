@@ -15,34 +15,37 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Encabezado -->
+        <!-- Título Principal de la Página -->
         <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,16" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-                <TextBlock Text="🍜" FontSize="28" VerticalAlignment="Center"/>
-                <TextBlock Text="Punto de Venta" Style="{StaticResource JpTitle}"/>
-
-                <!-- Botón Cargar menú -->
-                <Button Content="Cargar menú"
-                        Margin="16,0,0,0"
-                        Style="{StaticResource JpPrimaryButton}"
-                        Padding="14,8"
-                        Command="{Binding LoadMenuCommand}"/>
+                <TextBlock Text="🍜" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Punto de Venta" Style="{StaticResource JpPageTitle}"/>
+                <TextBlock Text="🍜" FontSize="32" VerticalAlignment="Center"/>
             </StackPanel>
 
             <Rectangle Style="{StaticResource JpSeparator}" Width="300" HorizontalAlignment="Center"/>
-            <Border Background="{StaticResource JpSurfaceBrush}"
-                    CornerRadius="{StaticResource JpRadiusM}"
-                    Padding="12,8"
-                    BorderBrush="{StaticResource JpGoldBrush}"
-                    BorderThickness="1"
-                    HorizontalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="&#xE82F;" Style="{StaticResource JpIcon}" FontSize="16"/>
-                    <TextBlock Text="Sistema de Ventas Activo"
-                               Foreground="{StaticResource JpBambooBrush}"
-                               FontWeight="SemiBold"/>
-                </StackPanel>
-            </Border>
+            
+            <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
+                <Border Background="{StaticResource JpSurfaceBrush}"
+                        CornerRadius="{StaticResource JpRadiusM}"
+                        Padding="12,8"
+                        BorderBrush="{StaticResource JpGoldBrush}"
+                        BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE82F;" Style="{StaticResource JpIcon}" FontSize="16"/>
+                        <TextBlock Text="Sistema de Ventas Activo"
+                                   Foreground="{StaticResource JpBambooBrush}"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Botón Cargar menú con estilo redondo -->
+                <Button Style="{StaticResource JpRoundButtonOrange}"
+                        Content="&#xE895;"
+                        FontFamily="Segoe MDL2 Assets"
+                        Command="{Binding LoadMenuCommand}"
+                        ToolTipService.ToolTip="Cargar menú"/>
+            </StackPanel>
         </StackPanel>
 
         <!-- CONTENIDO: 2 columnas (carrito más ancho) -->
@@ -65,12 +68,10 @@
 
                     <!-- Header menú -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
-                        <Border Background="{StaticResource JpCrimsonBrush}"
-                                CornerRadius="20" Width="40" Height="40">
-                            <TextBlock Text="&#xE7C7;" Style="{StaticResource JpIcon}"
-                                       Foreground="White" FontSize="16"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        <Button Style="{StaticResource JpRoundButton}" 
+                                Content="&#xE7C7;" 
+                                FontFamily="Segoe MDL2 Assets"
+                                IsEnabled="False"/>
                         <TextBlock Text="Menú del Restaurante"
                                    Style="{StaticResource JpCardTitle}"
                                    VerticalAlignment="Center"/>
@@ -167,12 +168,10 @@
 
                     <!-- Header carrito -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
-                        <Border Background="{StaticResource JpAccentBrush}"
-                                CornerRadius="20" Width="40" Height="40">
-                            <TextBlock Text="&#xE7BF;" Style="{StaticResource JpIcon}"
-                                       Foreground="White" FontSize="16"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        <Button Style="{StaticResource JpRoundButtonOrange}" 
+                                Content="&#xE7BF;" 
+                                FontFamily="Segoe MDL2 Assets"
+                                IsEnabled="False"/>
                         <TextBlock Text="Carrito de Compras"
                                    Style="{StaticResource JpCardTitle}"
                                    VerticalAlignment="Center"/>
@@ -283,8 +282,6 @@
                                                FontWeight="SemiBold" FontSize="16"
                                                Foreground="{StaticResource JpTextBrush}"/>
                                 </StackPanel>
-
-                                
 
                                 <StackPanel>
                                     <TextBlock Text="TOTAL" Foreground="{StaticResource JpCrimsonBrush}" FontSize="12" FontWeight="SemiBold"/>
