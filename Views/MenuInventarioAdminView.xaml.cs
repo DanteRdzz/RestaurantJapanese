@@ -1,20 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using RestaurantJapanese.ViewModels;
 
 namespace RestaurantJapanese.Views
 {
@@ -23,6 +9,40 @@ namespace RestaurantJapanese.Views
         public MenuInventarioAdminView()
         {
             InitializeComponent();
+            this.Loaded += MenuInventarioAdminView_Loaded;
+            this.Unloaded += MenuInventarioAdminView_Unloaded;
+        }
+
+        private void MenuInventarioAdminView_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is MenuInventarioAdminVM vm)
+            {
+                vm.OperationCompleted += Vm_OperationCompleted;
+                // Pass the UserControl's XamlRoot
+                vm.ViewXamlRoot = this.XamlRoot;
+            }
+        }
+
+        private void MenuInventarioAdminView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is MenuInventarioAdminVM vm)
+            {
+                vm.OperationCompleted -= Vm_OperationCompleted;
+            }
+        }
+
+        private async void Vm_OperationCompleted(bool success, string? message)
+        {
+            var root = this.XamlRoot;
+            var dlg = new ContentDialog
+            {
+                Title = success ? "? Operación exitosa" : "? Error",
+                Content = message ?? (success ? "Operación completada correctamente." : "Ocurrió un error."),
+                CloseButtonText = "OK",
+                XamlRoot = root
+            };
+
+            _ = dlg.ShowAsync();
         }
     }
 }

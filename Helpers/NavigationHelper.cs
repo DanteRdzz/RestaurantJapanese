@@ -59,8 +59,8 @@ namespace RestaurantJapanese.Helpers
 
                 if (shouldMaximize)
                 {
-                    // Configurar la ventana después de que se active
-                    window.Activated += (sender, args) =>
+                    // Intentar maximizar inmediatamente cuando la ventana se active
+                    void MaximizeWindow(object sender, WindowActivatedEventArgs args)
                     {
                         try
                         {
@@ -80,7 +80,36 @@ namespace RestaurantJapanese.Helpers
                         {
                             // Ignorar errores de configuración
                         }
-                    };
+                        
+                        // Remover el event handler después de la primera maximización
+                        window.Activated -= MaximizeWindow;
+                    }
+
+                    // Configurar la ventana después de que se active
+                    window.Activated += MaximizeWindow;
+                    
+                    // También intentar maximizar inmediatamente si ya está activa
+                    try
+                    {
+                        var hWnd = WindowNative.GetWindowHandle(window);
+                        if (hWnd != IntPtr.Zero)
+                        {
+                            var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
+                            var appWindow = AppWindow.GetFromWindowId(windowId);
+
+                            if (appWindow?.Presenter is OverlappedPresenter presenter)
+                            {
+                                presenter.Maximize();
+                                presenter.IsResizable = true;
+                                presenter.IsMaximizable = true;
+                                presenter.IsMinimizable = true;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // Si falla el intento inmediato, el evento Activated lo manejará
+                    }
                 }
             }
             catch

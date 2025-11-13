@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using RestaurantJapanese.Helpers;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -74,7 +75,14 @@ namespace RestaurantJapanese.ViewModels
         // ===== Placeholders (productos, etc.) =====
         public ICommand OpenInventoryCommand => new RelayCommand(_ =>
         {
-            var win = NavigationHelper.OpenWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>();
+            var win = NavigationHelper.OpenWindow<Views.MenuInventarioAdminView, MenuInventarioAdminVM>(
+                parameter: null, 
+                init: (vm, w) => 
+                { 
+                    vm.OwnWindow = w;
+                    // Cargar datos iniciales
+                    _ = vm.LoadAsync();
+                });
             win.Activate();
         });
 
