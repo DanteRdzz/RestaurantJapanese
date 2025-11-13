@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml;
-using RestaurantJapanese.Helpers;              // BaseViewModel, RelayCommand
-using RestaurantJapanese.Models;              // PosMenuItemModel, CarItemModels, PosTicket*
+using RestaurantJapanese.Helpers; // BaseViewModel, RelayCommand, AsyncRelayCommand
+using RestaurantJapanese.Models; // PosMenuItemModel, CarItemModels, PosTicket*
 using RestaurantJapanese.Services.Interfaces; // IPosService
 using System;
 using System.Collections.ObjectModel;
@@ -14,10 +14,16 @@ namespace RestaurantJapanese.ViewModels
     public class PosVM : BaseViewModel
     {
         private readonly IPosService _pos;
-        public PosVM(IPosService pos) => _pos = pos;
+        public PosVM(IPosService pos)
+        {
+            _pos = pos;
+            _loadMenuCommand = new AsyncRelayCommand(LoadMenuAsync, () => !IsBusy);
+            _checkoutCommand = new AsyncRelayCommand(CheckoutAsync, () => !IsBusy && Cart.Count>0 && CurrentUserId>0);
+        }
 
         public Window? OwnWindow { get; set; }
 
+<<<<<<< HEAD
         // Configuración de límites de negocio
         private const int MAX_ITEMS_IN_CART = 20; // Límite máximo de diferentes items en el carrito
         private const int MAX_QUANTITY_PER_ITEM = 10; // Cantidad máxima por item individual
@@ -30,6 +36,11 @@ namespace RestaurantJapanese.ViewModels
             get => _currentUserName;
             set => Set(ref _currentUserName, value);
         }
+=======
+        // Estado de ejecución
+        private bool _isBusy; public bool IsBusy { get => _isBusy; private set { Set(ref _isBusy, value); RaiseCanExec(); } }
+        private void RaiseCanExec() { (_loadMenuCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged(); (_checkoutCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged(); }
+>>>>>>> adding return buttons
 
         // Carga automática del menú al asignar el usuario
         private bool _menuLoaded;
@@ -40,10 +51,11 @@ namespace RestaurantJapanese.ViewModels
             set
             {
                 Set(ref _currentUserId, value);
-                if (!_menuLoaded && _currentUserId > 0)
+                RaiseCanExec();
+                if (!_menuLoaded && _currentUserId >0)
                 {
                     _menuLoaded = true;
-                    _ = LoadMenuAsync(); // dispara sin bloquear UI
+                    _ = LoadMenuAsync();
                 }
             }
         }
@@ -54,19 +66,20 @@ namespace RestaurantJapanese.ViewModels
 
         // Selección
         private PosMenuItemModel? _selected;
-        public PosMenuItemModel? Selected
-        {
-            get => _selected;
-            set => Set(ref _selected, value);
-        }
+        public PosMenuItemModel? Selected { get => _selected; set => Set(ref _selected, value); }
 
         // Cantidad
+<<<<<<< HEAD
         private int _qty = 1;
         public int Qty
         {
             get => _qty;
             set => Set(ref _qty, value < 1 ? 1 : (value > MAX_QUANTITY_PER_ITEM ? MAX_QUANTITY_PER_ITEM : value));
         }
+=======
+        private int _qty =1;
+        public int Qty { get => _qty; set => Set(ref _qty, value <1 ?1 : value); }
+>>>>>>> adding return buttons
 
         // Propiedades para mostrar información de límites
         public int MaxItemsInCart => MAX_ITEMS_IN_CART;
@@ -79,6 +92,7 @@ namespace RestaurantJapanese.ViewModels
         public string CartStatus => $"{CurrentItemCount}/{MaxItemsInCart} productos • {CurrentTotalQuantity}/{MaxTotalItems} items";
 
         // Totales
+<<<<<<< HEAD
         private decimal _tip = 0m;
         public decimal Tip
         {
@@ -106,15 +120,16 @@ namespace RestaurantJapanese.ViewModels
         public decimal Subtotal { get => _subtotal; private set => Set(ref _subtotal, value); }
         public decimal Tax { get => _tax; private set => Set(ref _tax, value); }
         public decimal Total { get => _total; private set => Set(ref _total, value); }
+=======
+        private decimal _tip =0m; public decimal Tip { get => _tip; set { Set(ref _tip, value); Recalc(); } }
+        private decimal _taxRate =0.16m; public decimal TaxRate { get => _taxRate; set { Set(ref _taxRate, value); Recalc(); } }
+        private decimal _subtotal, _tax, _total; public decimal Subtotal { get => _subtotal; private set => Set(ref _subtotal, value); } public decimal Tax { get => _tax; private set => Set(ref _tax, value); } public decimal Total { get => _total; private set => Set(ref _total, value); }
+>>>>>>> adding return buttons
 
         // Estado
-        private string? _error;
-        public string? Error
-        {
-            get => _error;
-            set => Set(ref _error, value);
-        }
+        private string? _error; public string? Error { get => _error; set => Set(ref _error, value); }
 
+<<<<<<< HEAD
         private string? _warning;
         public string? Warning
         {
@@ -128,23 +143,34 @@ namespace RestaurantJapanese.ViewModels
         public ICommand RemoveCommand => new RelayCommand(p => RemoveItem(p as CarItemModels));
         public ICommand ClearCommand => new RelayCommand(_ => { Cart.Clear(); Recalc(); UpdateCartStatus(); });
         public ICommand CheckoutCommand => new RelayCommand(_ => _ = CheckoutAsync());
+=======
+        // Commands
+        private readonly ICommand _loadMenuCommand; public ICommand LoadMenuCommand => _loadMenuCommand;
+        public ICommand AddCommand => new RelayCommand(_ => AddSelected());
+        public ICommand RemoveCommand => new RelayCommand(p => RemoveItem(p as CarItemModels));
+        public ICommand ClearCommand => new RelayCommand(_ => { Cart.Clear(); Recalc(); RaiseCanExec(); });
+        private readonly ICommand _checkoutCommand; public ICommand CheckoutCommand => _checkoutCommand;
+>>>>>>> adding return buttons
 
         // ===== Lógica =====
         public async Task LoadMenuAsync()
         {
-            Error = null;
+            if (IsBusy) return;
+            Error = null; IsBusy = true;
             try
             {
                 Menu.Clear();
-                var rows = await _pos.GetMenuAsync(); // IEnumerable<PosMenuItemModel>
+                var rows = await _pos.GetMenuAsync();
                 foreach (var r in rows) Menu.Add(r);
             }
             catch (SqlException ex) { Error = $"Error SQL ({ex.Number})."; }
             catch (System.Exception ex) { Error = ex.Message; }
+            finally { IsBusy = false; }
         }
 
         private void AddSelected()
         {
+<<<<<<< HEAD
             if (Selected is null || Qty <= 0) 
             {
                 Error = "Selecciona un producto y cantidad válida.";
@@ -186,15 +212,15 @@ namespace RestaurantJapanese.ViewModels
 
             // Agregar al carrito
             if (existingItem == null)
+=======
+            if (Selected is null || Qty <=0) return;
+            var existing = Cart.FirstOrDefault(x => x.IdMenuItem == Selected.IdMenuItem);
+            if (existing is null)
+>>>>>>> adding return buttons
             {
-                Cart.Add(new CarItemModels
-                {
-                    IdMenuItem = Selected.IdMenuItem,
-                    Name = Selected.Name,
-                    UnitPrice = Selected.Price,
-                    Qty = Qty
-                });
+                Cart.Add(new CarItemModels { IdMenuItem = Selected.IdMenuItem, Name = Selected.Name, UnitPrice = Selected.Price, Qty = Qty });
             }
+<<<<<<< HEAD
             else
             {
                 existingItem.Qty = newQuantity;
@@ -206,10 +232,15 @@ namespace RestaurantJapanese.ViewModels
 
             // Mostrar advertencia si se está acercando a los límites
             CheckLimitsWarning();
+=======
+            else { existing.Qty += Qty; OnPropertyChanged(nameof(Cart)); }
+            Recalc(); RaiseCanExec();
+>>>>>>> adding return buttons
         }
 
         private void RemoveItem(CarItemModels? item)
         {
+<<<<<<< HEAD
             if (item is null) return;
             Cart.Remove(item);
             Recalc();
@@ -221,19 +252,26 @@ namespace RestaurantJapanese.ViewModels
                 Error = null;
                 Warning = null;
             }
+=======
+            if (item is null) return; Cart.Remove(item); Recalc(); RaiseCanExec();
+>>>>>>> adding return buttons
         }
 
         private void Recalc()
         {
             Subtotal = Cart.Sum(x => x.LineTotal);
-            Tax = System.Math.Round(Subtotal * TaxRate, 2);
+            Tax = System.Math.Round(Subtotal * TaxRate,2);
             Total = Subtotal + Tax + Tip;
+<<<<<<< HEAD
 
             System.Diagnostics.Debug.WriteLine($"[PosVM] Recalc - Subtotal: {Subtotal}, Tax: {Tax}, Tip: {Tip}, Total: {Total}");
 
             OnPropertyChanged(nameof(Subtotal));
             OnPropertyChanged(nameof(Tax));
             OnPropertyChanged(nameof(Total));
+=======
+            OnPropertyChanged(nameof(Subtotal)); OnPropertyChanged(nameof(Tax)); OnPropertyChanged(nameof(Total));
+>>>>>>> adding return buttons
         }
 
         private void UpdateCartStatus()
@@ -260,7 +298,9 @@ namespace RestaurantJapanese.ViewModels
 
         private async Task CheckoutAsync()
         {
+            if (IsBusy) return;
             Error = null;
+<<<<<<< HEAD
             Warning = null;
 
             if (Cart.Count == 0) 
@@ -308,11 +348,27 @@ namespace RestaurantJapanese.ViewModels
                         CloseButtonText = "OK",
                         XamlRoot = root
                     };
+=======
+            if (Cart.Count ==0) { Error = "Carrito vacío."; return; }
+            if (CurrentUserId <=0) { Error = "Usuario inválido."; return; }
+            IsBusy = true;
+            try
+            {
+                var items = Cart.Select(c => (c.IdMenuItem, c.Qty));
+                var ticket = await _pos.CreateTicketAsync(CurrentUserId, Tip, TaxRate, items);
+                Cart.Clear(); Tip =0m; Recalc(); RaiseCanExec();
+                var msg = $"Ticket #{ticket.Header.IdTicket}\nSubtotal: {ticket.Header.Subtotal:C}\nIVA: {ticket.Header.Tax:C}\nPropina: {ticket.Header.Tip:C}\nTotal: {ticket.Header.Total:C}";
+                var root = (OwnWindow?.Content as FrameworkElement)?.XamlRoot;
+                if (root is not null)
+                {
+                    var dlg = new Microsoft.UI.Xaml.Controls.ContentDialog { Title = "Venta registrada", Content = msg, CloseButtonText = "OK", XamlRoot = root };
+>>>>>>> adding return buttons
                     await dlg.ShowAsync();
                 }
             }
             catch (SqlException ex) { Error = $"Error SQL ({ex.Number})."; }
             catch (System.Exception ex) { Error = ex.Message; }
+            finally { IsBusy = false; }
         }
     }
 }

@@ -7,15 +7,20 @@
     <!-- Recursos -->
     <UserControl.Resources>
         <helpers:CurrencyConverterHelper x:Key="CurrencyConverter"/>
+<<<<<<< HEAD
         <helpers:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </UserControl.Resources>
+=======
+  </UserControl.Resources>
+>>>>>>> adding return buttons
 
     <Grid Background="{StaticResource JpGradientBg}" Padding="24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+<<<<<<< HEAD
         <!-- TÃ­tulo Principal de la PÃ¡gina -->
         <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,16" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
@@ -110,26 +115,65 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
+=======
+        <!-- Botón Volver Atrás arriba a la derecha -->
+        <Button Grid.Row="0" Content="Volver" 
+      HorizontalAlignment="Right" VerticalAlignment="Top" 
+  Margin="0,0,8,8" 
+           Style="{StaticResource JpSecondaryButton}" 
+ Padding="12,6"
+                Command="{Binding GoBackCommand}"/>
+
+        <!-- Encabezado -->
+        <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,16" HorizontalAlignment="Center">
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+         <TextBlock Text="??" FontSize="28" VerticalAlignment="Center"/>
+   <TextBlock Text="Punto de Venta" Style="{StaticResource JpTitle}"/>
+
+   <!-- Botón Cargar menú -->
+        <Button Content="Cargar menú"
+              Margin="16,0,0,0"
+          Style="{StaticResource JpPrimaryButton}"
+             Padding="14,8"
+        Command="{Binding LoadMenuCommand}"/>
+    </StackPanel>
+
+  <Rectangle Style="{StaticResource JpSeparator}" Width="300" HorizontalAlignment="Center"/>
+            <Border Background="{StaticResource JpSurfaceBrush}"
+         CornerRadius="{StaticResource JpRadiusM}"
+            Padding="12,8"
+    BorderBrush="{StaticResource JpGoldBrush}"
+       BorderThickness="1"
+        HorizontalAlignment="Center">
+         <StackPanel Orientation="Horizontal" Spacing="8">
+           <TextBlock Text="&#xE82F;" Style="{StaticResource JpIcon}" FontSize="16"/>
+       <TextBlock Text="Sistema de Ventas Activo"
+    Foreground="{StaticResource JpBambooBrush}"
+            FontWeight="SemiBold"/>
+       </StackPanel>
+            </Border>
+>>>>>>> adding return buttons
         </StackPanel>
 
-        <!-- CONTENIDO: 2 columnas (carrito mÃ¡s ancho) -->
-        <Grid Grid.Row="1" ColumnSpacing="20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2.6*"/>
-                <!-- MenÃº -->
-                <ColumnDefinition Width="1.4*"/>
-                <!-- Carrito -->
-            </Grid.ColumnDefinitions>
+        <!-- CONTENIDO: 2 columnas (carrito más ancho) -->
+   <Grid Grid.Row="1" ColumnSpacing="20">
+   <Grid.ColumnDefinitions>
+       <ColumnDefinition Width="2.6*"/>
+ <!-- Menú -->
+    <ColumnDefinition Width="1.4*"/>
+    <!-- Carrito -->
+       </Grid.ColumnDefinitions>
 
-            <!-- ========== IZQUIERDA: MENÃš ========== -->
-            <Border Grid.Column="0" Style="{StaticResource JpAdminCard}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+            <!-- ========== IZQUIERDA: MENÚ ========== -->
+    <Border Grid.Column="0" Style="{StaticResource JpAdminCard}">
+           <Grid>
+          <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+     <RowDefinition Height="Auto"/>
+         </Grid.RowDefinitions>
 
+<<<<<<< HEAD
                     <!-- Header menÃº -->
                     <StackPanel Grid.Row="0"
                                 Orientation="Horizontal"
@@ -145,58 +189,73 @@
                                    Style="{StaticResource JpCardTitle}"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
+=======
+ <!-- Header menú -->
+<StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+             <Border Background="{StaticResource JpCrimsonBrush}"
+   CornerRadius="20" Width="40" Height="40">
+    <TextBlock Text="&#xE7C7;" Style="{StaticResource JpIcon}"
+  Foreground="White" FontSize="16"
+         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+    <TextBlock Text="Menú del Restaurante"
+         Style="{StaticResource JpCardTitle}"
+         VerticalAlignment="Center"/>
+ </StackPanel>
+>>>>>>> adding return buttons
 
-                    <!-- Lista menÃº -->
-                    <Border Grid.Row="1"
-                            Background="{StaticResource JpSurfaceBrush}"
-                            CornerRadius="{StaticResource JpRadiusM}"
-                            BorderBrush="{StaticResource JpLineBrush}"
-                            BorderThickness="1">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ListView ItemsSource="{Binding Menu}"
-                                      SelectedItem="{Binding Selected, Mode=TwoWay}"
-                                      Style="{StaticResource JpListView}"
-                                      Background="Transparent">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="Transparent"
-                                                Padding="16,12"
-                                                CornerRadius="{StaticResource JpRadiusS}"
-                                                Margin="4,2">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding Name}"
-                                                               FontWeight="SemiBold"
-                                                               FontSize="16"
-                                                               Foreground="{StaticResource JpTextBrush}"/>
-                                                    <TextBlock Text="{Binding Description}"
-                                                               Foreground="{StaticResource JpMutedBrush}"
-                                                               TextWrapping="Wrap"
-                                                               FontSize="14"
-                                                               Margin="0,4,0,0"/>
-                                                </StackPanel>
-                                                <Border Grid.Column="1"
-                                                        Background="{StaticResource JpGoldBrush}"
-                                                        CornerRadius="15"
-                                                        Padding="12,6"
-                                                        VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Price, Converter={StaticResource CurrencyConverter}}"
-                                                               Foreground="White"
-                                                               FontWeight="SemiBold"
-                                                               FontSize="14"/>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                        </ScrollViewer>
-                    </Border>
+           <!-- Lista menú -->
+         <Border Grid.Row="1"
+      Background="{StaticResource JpSurfaceBrush}"
+               CornerRadius="{StaticResource JpRadiusM}"
+       BorderBrush="{StaticResource JpLineBrush}"
+         BorderThickness="1">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+     <ListView ItemsSource="{Binding Menu}"
+      SelectedItem="{Binding Selected, Mode=TwoWay}"
+        Style="{StaticResource JpListView}"
+      Background="Transparent">
+      <ListView.ItemTemplate>
+      <DataTemplate>
+     <Border Background="Transparent"
+        Padding="16,12"
+              CornerRadius="{StaticResource JpRadiusS}"
+      Margin="4,2">
+     <Grid>
+       <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+         <ColumnDefinition Width="Auto"/>
+  </Grid.ColumnDefinitions>
+    <StackPanel>
+      <TextBlock Text="{Binding Name}"
+                FontWeight="SemiBold"
+         FontSize="16"
+            Foreground="{StaticResource JpTextBrush}"/>
+    <TextBlock Text="{Binding Description}"
+ Foreground="{StaticResource JpMutedBrush}"
+   TextWrapping="Wrap"
+          FontSize="14"
+     Margin="0,4,0,0"/>
+       </StackPanel>
+           <Border Grid.Column="1"
+                 Background="{StaticResource JpGoldBrush}"
+     CornerRadius="15"
+         Padding="12,6"
+  VerticalAlignment="Center">
+    <TextBlock Text="{Binding Price, Converter={StaticResource CurrencyConverter}}"
+       Foreground="White"
+      FontWeight="SemiBold"
+       FontSize="14"/>
+    </Border>
+         </Grid>
+       </Border>
+                 </DataTemplate>
+          </ListView.ItemTemplate>
+           </ListView>
+         </ScrollViewer>
+          </Border>
 
+<<<<<<< HEAD
                     <!-- Cantidad + Agregar -->
                     <Border Grid.Row="2"
                             Background="{StaticResource JpSurfaceBrush}"
@@ -424,6 +483,187 @@
                     </Border>
                 </Grid>
             </Border>
+=======
+      <!-- Cantidad + Agregar -->
+             <Border Grid.Row="2"
+     Background="{StaticResource JpSurfaceBrush}"
+        CornerRadius="{StaticResource JpRadiusM}"
+     Padding="16"
+   Margin="0,8,0,0"
+  BorderBrush="{StaticResource JpLineBrush}"
+         BorderThickness="1">
+     <StackPanel Orientation="Horizontal" Spacing="16">
+   <TextBlock Text="Cantidad:" VerticalAlignment="Center"
+   FontWeight="SemiBold" Foreground="{StaticResource JpTextBrush}"/>
+     <NumberBox Width="120" Minimum="1"
+             Value="{Binding Qty, Mode=TwoWay}"
+ CornerRadius="{StaticResource JpRadiusS}" FontSize="16"/>
+       <Button Content="Agregar al Carrito"
+     Style="{StaticResource JpPrimaryButton}"
+         Command="{Binding AddCommand}"
+              Padding="16,8"
+     HorizontalAlignment="Left"/>
+           </StackPanel>
+        </Border>
+          </Grid>
+  </Border>
+
+     <!-- ========== DERECHA: CARRITO + TOTALES ABAJO ========== -->
+          <Border Grid.Column="1" Style="{StaticResource JpAdminCard}" MinWidth="420">
+ <Grid>
+     <Grid.RowDefinitions>
+       <RowDefinition Height="Auto"/>
+  <!-- header carrito -->
+   <RowDefinition Height="*"/>
+          <!-- lista carrito -->
+       <RowDefinition Height="Auto"/>
+     <!-- botones carrito -->
+   <RowDefinition Height="Auto"/>
+   <!-- totales + checkout -->
+            </Grid.RowDefinitions>
+
+            <!-- Header carrito -->
+ <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+        <Border Background="{StaticResource JpAccentBrush}"
+           CornerRadius="20" Width="40" Height="40">
+  <TextBlock Text="&#xE7BF;" Style="{StaticResource JpIcon}"
+    Foreground="White" FontSize="16"
+            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+           <TextBlock Text="Carrito de Compras"
+            Style="{StaticResource JpCardTitle}"
+   VerticalAlignment="Center"/>
+  </StackPanel>
+
+        <!-- Lista carrito -->
+             <Border Grid.Row="1"
+             Background="{StaticResource JpSurfaceBrush}"
+         CornerRadius="{StaticResource JpRadiusM}"
+        BorderBrush="{StaticResource JpLineBrush}"
+                  BorderThickness="1">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+           <ListView ItemsSource="{Binding Cart}"
+           SelectionMode="Single"
+              Style="{StaticResource JpListView}"
+          Background="Transparent">
+              <ListView.ItemTemplate>
+      <DataTemplate>
+       <Border Background="Transparent"
+ Padding="12,8"
+    CornerRadius="{StaticResource JpRadiusS}"
+      Margin="2">
+     <Grid>
+          <Grid.ColumnDefinitions>
+     <ColumnDefinition Width="2*"/>
+          <ColumnDefinition Width="Auto"/>
+  <ColumnDefinition Width="Auto"/>
+       <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+   <TextBlock Text="{Binding Name}"
+    FontWeight="SemiBold"
+    Foreground="{StaticResource JpTextBrush}"
+     TextTrimming="CharacterEllipsis"/>
+  <Border Grid.Column="1"
+       Background="{StaticResource JpBambooBrush}"
+         CornerRadius="10"
+Padding="8,4"
+              Margin="8,0,0,0"
+VerticalAlignment="Center">
+     <TextBlock Text="{Binding Qty}"
+                Foreground="White"
+            FontWeight="SemiBold"
+       FontSize="12"/>
+          </Border>
+      <TextBlock Grid.Column="2"
+          Text="{Binding UnitPrice, Converter={StaticResource CurrencyConverter}}"
+           Margin="8,0,0,0"
+         Foreground="{StaticResource JpMutedBrush}"
+       FontSize="12"
+        VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="3"
+          Text="{Binding LineTotal, Converter={StaticResource CurrencyConverter}}"
+        Margin="8,0,0,0"
+      FontWeight="SemiBold"
+   Foreground="{StaticResource JpTextBrush}"
+ VerticalAlignment="Center"/>
+      </Grid>
+           </Border>
+     </DataTemplate>
+   </ListView.ItemTemplate>
+    </ListView>
+           </ScrollViewer>
+    </Border>
+
+      <!-- Botones carrito -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+    <Button Content="Quitar Seleccionado"
+          Command="{Binding RemoveCommand}"
+             Style="{StaticResource JpSecondaryButton}"
+        Padding="12,6"
+           HorizontalAlignment="Left"/>
+      <Button Content="Limpiar Carrito"
+      Command="{Binding ClearCommand}"
+     Style="{StaticResource JpPrimaryButton}"
+    Padding="12,6"
+    HorizontalAlignment="Left"/>
+        </StackPanel>
+
+                <!-- Totales + Checkout (botón centrado abajo) -->
+     <Border Grid.Row="3" Margin="0,10,0,0"
+       Background="{StaticResource JpSurfaceBrush}"
+         CornerRadius="{StaticResource JpRadiusM}"
+              Padding="14"
+     BorderBrush="{StaticResource JpLineBrush}"
+   BorderThickness="1">
+   <Grid>
+            <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+    <RowDefinition Height="Auto"/>
+   </Grid.RowDefinitions>
+       <Grid.ColumnDefinitions>
+   <ColumnDefinition Width="*"/>
+    <ColumnDefinition Width="Auto"/>
+     </Grid.ColumnDefinitions>
+
+  <!-- Totales -->
+           <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="20">
+      <StackPanel>
+              <TextBlock Text="Subtotal" Foreground="{StaticResource JpMutedBrush}" FontSize="12"/>
+         <TextBlock Text="{Binding Subtotal, Converter={StaticResource CurrencyConverter}}"
+       FontWeight="SemiBold" FontSize="16"
+          Foreground="{StaticResource JpTextBrush}"/>
+      </StackPanel>
+
+    <StackPanel>
+        <TextBlock Text="IVA (16%)" Foreground="{StaticResource JpMutedBrush}" FontSize="12"/>
+   <TextBlock Text="{Binding Tax, Converter={StaticResource CurrencyConverter}}"
+   FontWeight="SemiBold" FontSize="16"
+     Foreground="{StaticResource JpTextBrush}"/>
+  </StackPanel>
+
+<StackPanel>
+             <TextBlock Text="TOTAL" Foreground="{StaticResource JpCrimsonBrush}" FontSize="12" FontWeight="SemiBold"/>
+   <TextBlock Text="{Binding Total, Converter={StaticResource CurrencyConverter}}"
+         FontWeight="Bold" FontSize="20"
+ Foreground="{StaticResource JpCrimsonBrush}"/>
+         </StackPanel>
+           </StackPanel>
+
+              <!-- Botón procesar -->
+                <Button Grid.Row="1" Grid.ColumnSpan="2"
+                Content="?? Procesar Venta"
+      Style="{StaticResource JpPrimaryButton}"
+      Command="{Binding CheckoutCommand}"
+              Padding="14,8"
+  MinWidth="150"
+                  FontSize="14"
+   HorizontalAlignment="Center"
+ Margin="0,10,0,0"/>
+    </Grid>
+         </Border>
+ </Grid>
+ </Border>
+>>>>>>> adding return buttons
         </Grid>
     </Grid>
 </UserControl>

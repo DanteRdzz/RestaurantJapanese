@@ -19,14 +19,12 @@ namespace RestaurantJapanese
         public App()
         {
             InitializeComponent();
-
             HostApp = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    // DataAccess 
+                    // DataAccess
                     services.AddSingleton<IConnFactory, ConnectionFactory>();
-
-                    // Repository / Services 
+                    // Repository / Services
                     services.AddTransient<ILoginRepository, LoginRepository>();
                     services.AddTransient<ILoginService, LoginService>();
                     services.AddTransient<IEmployeeRepository, EmployeeRepository>();
@@ -37,19 +35,15 @@ namespace RestaurantJapanese
                     services.AddTransient<IReportsService, ReportsService>();
                     services.AddTransient<IMenuRepository, MenuRepository>();
                     services.AddTransient<IMenuService, MenuService>();
-
                     // ViewModels
                     services.AddTransient<LoginVM>();
-                    services.AddTransient<HomeVM>();
                     services.AddTransient<AdminMenuVM>();
                     services.AddTransient<AdminEmployeesMenuVM>();
                     services.AddTransient<PosVM>();
                     services.AddTransient<ReportsVM>();
                     services.AddTransient<MenuInventarioAdminVM>();
-
-                    // Views 
+                    // Views
                     services.AddTransient<LoginView>();
-                    services.AddTransient<HomeView>();
                     services.AddTransient<AdminMenuView>();
                     services.AddTransient<AdminEmployeesMenuView>();
                     services.AddTransient<PosView>();
@@ -57,20 +51,18 @@ namespace RestaurantJapanese
                     services.AddTransient<MenuInventarioAdminView>();
                 })
                 .Build();
-
-            // Exponer el contenedor al NavigationHelper (estilo ALTYS)
             NavigationHelper.Services = HostApp.Services;
+            this.HighContrastAdjustment = ApplicationHighContrastAdjustment.None;
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
+<<<<<<< HEAD
             // Abrir la ventana de Login (sin maximizar)
+=======
+>>>>>>> adding return buttons
             var win = NavigationHelper.OpenWindow<LoginView, LoginVM>();
-
-            // Guardar la referencia de la Window en el VM para poder cerrarla al navegar
-            if ((win.Content as Microsoft.UI.Xaml.FrameworkElement)?.DataContext is LoginVM vm)
-                vm.OwnWindow = win;
-
+            if ((win.Content as FrameworkElement)?.DataContext is LoginVM vm) vm.OwnWindow = win;
             win.Activate();
         }
     }

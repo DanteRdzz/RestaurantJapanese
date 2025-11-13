@@ -13,6 +13,6 @@ namespace RestaurantJapanese.Models
         public string PasswordText { get; set; } = "";
         public string DisplayName { get; set; } = "";
         public int IsActive { get; set; }
-        public string Role {  get; set; }
+        public string Role { get; set; } = "empleado"; // valor por defecto para evitar warning
     }
 }
