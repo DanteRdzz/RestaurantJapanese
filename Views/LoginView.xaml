@@ -1,9 +1,10 @@
 <UserControl
     x:Class="RestaurantJapanese.Views.LoginView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    KeyDown="OnKeyDown">
 
-    <!-- Fondo general con “brisa” sakura suave -->
+    <!-- Fondo general con "brisa" sakura suave -->
     <Grid Background="{StaticResource JpBgBrush}">
         <Grid>
             <!-- Ornamentos suaves (no bloquean interacción) -->
@@ -34,7 +35,7 @@
             <Border Grid.Row="0" Style="{StaticResource JpCard}" Width="400">
                 <StackPanel Spacing="16">
 
-                    <!-- Encabezado con banda roja tipo “noren” -->
+                    <!-- Encabezado con banda roja tipo "noren" -->
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="6"/>
@@ -56,20 +57,24 @@
                     <!-- Formulario -->
                     <StackPanel Spacing="10">
                         <TextBox
-              Style="{StaticResource JpTextBox}"
-              PlaceholderText="Usuario"
-              Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            x:Name="UserNameTextBox"
+                            Style="{StaticResource JpTextBox}"
+                            PlaceholderText="Usuario"
+                            Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            KeyDown="UserNameTextBox_KeyDown"/>
 
                         <PasswordBox
-              x:Name="Pwd"
-              Style="{StaticResource JpPasswordBox}"
-              PlaceholderText="Contraseña"/>
+                            x:Name="Pwd"
+                            Style="{StaticResource JpPasswordBox}"
+                            PlaceholderText="Contraseña"
+                            KeyDown="PasswordBox_KeyDown"/>
 
                         <Button
-              Style="{StaticResource JpPrimaryButton}"
-              Content="Iniciar sesión"
-              Command="{Binding SignInCommand}"
-              CommandParameter="{Binding ElementName=Pwd, Path=Password}"/>
+                            x:Name="LoginButton"
+                            Style="{StaticResource JpPrimaryButton}"
+                            Content="Iniciar sesión"
+                            Command="{Binding SignInCommand}"
+                            CommandParameter="{Binding ElementName=Pwd, Path=Password}"/>
                     </StackPanel>
 
                     <!-- Mensaje de error -->

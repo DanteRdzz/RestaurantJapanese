@@ -21,9 +21,8 @@
                 <TextBlock Text="Reportes de Ventas" Style="{StaticResource JpPageTitle}"/>
             </StackPanel>
             <Rectangle Style="{StaticResource JpSeparator}" Width="200" HorizontalAlignment="Center"/>
-            <TextBlock Text="Analiza las ventas de tu restaurante japonés con detalle y precisión"
-                       Style="{StaticResource JpPageSubtitle}"
-                       TextAlignment="Center"/>
+            <TextBlock Text="Analiza las Ventas con Detalle y Precision"
+                       Style="{StaticResource JpPageSubtitle}" TextAlignment="Center"/>
         </StackPanel>
 
         <!-- Filtros -->
@@ -36,33 +35,39 @@
                 BorderThickness="1">
             <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
                 <TextBlock Text="Desde:" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                <DatePicker Width="200" Date="{Binding FromDateOffset, Mode=TwoWay}"/>
+                <DatePicker Width="220" Date="{Binding FromDateOffset, Mode=TwoWay}"/>
 
                 <TextBlock Text="Hasta:" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                <DatePicker Width="200" Date="{Binding ToDateOffset, Mode=TwoWay}"/>
+                <DatePicker Width="220" Date="{Binding ToDateOffset, Mode=TwoWay}"/>
 
-                <!-- Botones tamaño normal -->
+                <!-- Botones más anchos y redondeados -->
                 <Button Content="Cargar"
                         Margin="12,0,0,0"
                         Command="{Binding LoadCommand}"
                         Style="{StaticResource JpPrimaryButton}"
-                        Height="32"
-                        Padding="10,4"/>
+                        Height="40"
+                        Padding="16,6"
+                        Width="120"
+                        CornerRadius="20"/>
 
                 <Button Content="Hoy"
                         Margin="8,0,0,0"
                         Command="{Binding QuickTodayCommand}"
                         Style="{StaticResource JpSecondaryButton}"
-                        Height="32"
-                        Padding="10,4"/>
+                        Height="40"
+                        Padding="16,6"
+                        Width="120"
+                        CornerRadius="20"/>
 
                 <Button Content="Todos"
                         Margin="8,0,0,0"
                         Command="{Binding QuickAllCommand}"
                         Style="{StaticResource JpAccentButton}"
-                        Height="32"
-                        Padding="10,4"
-                        ToolTipService.ToolTip="Mostrar todos los registros"/>
+                        Height="40"
+                        Padding="16,6"
+                        Width="120"
+                        ToolTipService.ToolTip="Mostrar todos los registros"
+                        CornerRadius="20"/>
             </StackPanel>
         </Border>
 
